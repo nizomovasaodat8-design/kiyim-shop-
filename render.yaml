@@ -1,0 +1,21 @@
+# Render.com uchun sozlama — "Blueprint" orqali bir bosishda ishga tushadi
+services:
+  - type: web
+    name: kiyim-shop
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: ADMIN_PASSWORD
+        generateValue: true      # Render o'zi tasodifiy parol yaratadi
+      - key: HF_TOKEN
+        sync: false              # ixtiyoriy — Render so'raydi
+      - key: GEMINI_API_KEY
+        sync: false              # ixtiyoriy
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false              # ixtiyoriy
+      - key: TELEGRAM_CHAT_ID
+        sync: false              # ixtiyoriy

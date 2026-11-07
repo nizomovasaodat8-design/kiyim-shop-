@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kiyim — kiyib ko'rib xarid qiling</title>
+  <meta name="description" content="Kamerangiz orqali kiyimni kiyib ko'ring, keyin buyurtma bering.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- 1. Yuguruvchi e'lon qatori -->
+  <div class="ticker">
+    <div class="ticker__track">
+      <span>● Toshkent bo'ylab yetkazib berish 1 kunda</span>
+      <span>● Hech narsa o'rnatish shart emas — kamerangiz yetarli</span>
+      <span>● Kiyib ko'ring, keyin buyurtma bering</span>
+      <span>● Toshkent bo'ylab yetkazib berish 1 kunda</span>
+      <span>● Hech narsa o'rnatish shart emas — kamerangiz yetarli</span>
+      <span>● Kiyib ko'ring, keyin buyurtma bering</span>
+    </div>
+  </div>
+
+  <!-- 2. Header -->
+  <header class="header">
+    <a href="#" class="logo">Kiyim<span>.</span></a>
+    <nav class="nav" id="nav"></nav>
+    <button class="cart-btn" id="cartBtn">
+      Savat <span class="cart-btn__count" id="cartCount">0</span>
+    </button>
+  </header>
+
+  <!-- 3. Hero -->
+  <section class="hero">
+    <div class="hero__text">
+      <p class="kicker">Virtual kiyib ko'rish · har bir kartada</p>
+      <h1>Yetkazilishidan <em>oldin</em><br>kiyib ko'ring.</h1>
+      <p class="hero__lead">
+        Do'kondagi har bir buyum kiyinish xonasini ochadi. Kamerangiz yonadi,
+        chiziqlar qayerda turishni ko'rsatadi, kurtka, ko'zoynak yoki shlyapa esa
+        ustingizda paydo bo'lib, siz bilan birga harakatlanadi.
+      </p>
+      <div class="hero__actions">
+        <button class="btn btn--red" id="heroTry">Kiyib ko'rish</button>
+        <a href="#catalog" class="btn btn--ghost" id="allCount">Barcha buyumlar</a>
+      </div>
+      <div class="hero__stats">
+        <div><b>720p</b><span>kamera sifati</span></div>
+        <div><b>0</b><span>ilova o'rnatish</span></div>
+        <div><b>AI</b><span>haqiqiy ko'rinish</span></div>
+      </div>
+    </div>
+    <div class="hero__visual" id="heroVisual"></div>
+  </section>
+
+  <!-- 4. Katalog -->
+  <section class="catalog" id="catalog">
+    <div class="chips" id="chips"></div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <footer class="footer">
+    <span>© 2026 Kiyim</span>
+    <span class="mono">Kamera faqat brauzeringizda ishlaydi · Suratlar: Unsplash</span>
+  </footer>
+
+  <!-- 5. Savat va buyurtma -->
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <div class="drawer__head">
+      <h3 id="drawerTitle">Savat</h3>
+      <button class="icon-btn" id="drawerClose">✕</button>
+    </div>
+
+    <!-- 5a. Savat ro'yxati -->
+    <div class="drawer__view" id="viewCart">
+      <div class="drawer__items" id="drawerItems"></div>
+      <div class="drawer__foot">
+        <div class="drawer__total"><span>Jami</span><b id="drawerTotal">0 so'm</b></div>
+        <button class="btn btn--light btn--full" id="toCheckout">Buyurtma berish</button>
+      </div>
+    </div>
+
+    <!-- 5b. Buyurtma formasi -->
+    <form class="drawer__view checkout" id="viewCheckout" hidden>
+      <label>Ismingiz<input name="name" required minlength="2" autocomplete="name" placeholder="Aziz"></label>
+      <label>Telefon<input name="phone" required type="tel" autocomplete="tel" placeholder="+998 90 123 45 67"></label>
+      <label>Manzil<textarea name="address" rows="3" placeholder="Toshkent, Chilonzor 9-kvartal, 12-uy"></textarea></label>
+      <p class="checkout__note mono">To'lov: yetkazib berilganda naqd yoki karta orqali</p>
+      <p class="form-error" id="orderError"></p>
+      <div class="drawer__foot">
+        <div class="drawer__total"><span>Jami</span><b id="checkoutTotal">0 so'm</b></div>
+        <button class="btn btn--red btn--full" id="orderSubmit">Tasdiqlash</button>
+        <button type="button" class="btn btn--ghost btn--full" id="backToCart">← Savatga qaytish</button>
+      </div>
+    </form>
+
+    <!-- 5c. Muvaffaqiyat -->
+    <div class="drawer__view done" id="viewDone" hidden>
+      <div class="done__icon">✓</div>
+      <h3>Rahmat!</h3>
+      <p>Buyurtmangiz <b id="orderId">#</b> qabul qilindi.<br>Tez orada operatorimiz qo'ng'iroq qiladi.</p>
+      <button class="btn btn--light" id="doneClose">Xaridni davom ettirish</button>
+    </div>
+  </aside>
+  <div class="backdrop" id="backdrop"></div>
+
+  <!-- 6. KIYINISH XONASI -->
+  <div class="tryon" id="tryon" aria-hidden="true">
+    <div class="tryon__stage">
+      <video id="video" playsinline muted></video>
+      <canvas id="canvas"></canvas>
+
+      <svg class="guide" id="guide" viewBox="0 0 400 600" preserveAspectRatio="xMidYMax meet">
+        <circle cx="200" cy="150" r="58" />
+        <path d="M200 215 C 120 215 70 250 62 330 L 50 600 M200 215 C 280 215 330 250 338 330 L 350 600
+                 M118 300 L 112 600 M282 300 L 288 600" />
+      </svg>
+
+      <div class="tryon__badge" id="badge">✦ Jonli rejim</div>
+      <div class="tryon__hint" id="hint">Chiziqlar ichiga turing</div>
+
+      <div class="tryon__top">
+        <button class="pill" id="toggleGuide">Chiziqlar</button>
+        <button class="pill pill--red" id="snap">● Surat</button>
+        <button class="icon-btn" id="tryonClose">✕</button>
+      </div>
+      <div class="tryon__status mono" id="status">Kamera ishga tushmoqda…</div>
+
+      <!-- AI kutish ekrani -->
+      <div class="ai-loading" id="aiLoading">
+        <img id="aiPreview" alt="">
+        <div class="ai-loading__scan"></div>
+        <div class="ai-loading__box">
+          <span class="spinner"></span>
+          <b>AI kiyimni kiydirmoqda…</b>
+          <span class="mono" id="aiTimer">0 s</span>
+        </div>
+      </div>
+
+      <!-- AI natijasi -->
+      <div class="ai-result" id="aiResult">
+        <img id="aiResultImg" alt="AI natija">
+        <div class="ai-result__tag">✦ AI · <span id="aiResultName"></span></div>
+        <div class="ai-result__bar">
+          <button class="pill" id="aiBack">← Jonli rejim</button>
+          <button class="pill" id="aiRetry">↻ Qayta</button>
+          <button class="pill" id="aiSave">⤓ Saqlash</button>
+          <button class="pill pill--red" id="aiAdd">+ Savatga</button>
+        </div>
+      </div>
+
+      <!-- AI xatosi -->
+      <div class="ai-error" id="aiError">
+        <p id="aiErrorText"></p>
+        <button class="pill" id="aiErrorClose">Yopish</button>
+      </div>
+    </div>
+
+    <aside class="tryon__panel">
+      <div class="current">
+        <div class="current__img" id="curImg"></div>
+        <div>
+          <p class="kicker" id="curCat">—</p>
+          <h3 id="curName">—</h3>
+          <p class="current__price" id="curPrice">—</p>
+        </div>
+      </div>
+      <button class="btn btn--light btn--full" id="curAdd">Savatga</button>
+
+      <div class="ai-box">
+        <button class="btn btn--red btn--full" id="aiBtn">✦ AI bilan kiyib ko'rish</button>
+        <label class="btn btn--ghost btn--full upload">
+          ⤒ Rasm yuklash
+          <input type="file" id="uploadInput" accept="image/*" hidden>
+        </label>
+        <p class="mono ai-box__note">Kameraga to'liq ko'rinib turing yoki o'z rasmingizni yuklang. Natija ~15–40 soniyada tayyor. Bepul AI kiyim, ko'ylak va shimlarni kiydiradi.</p>
+      </div>
+
+      <div class="panel__row mono">
+        <span>Keyingisi</span><span>← → almashtirish</span>
+      </div>
+      <div class="mini-grid" id="miniGrid"></div>
+    </aside>
+  </div>
+
+  <script src="js/products.js"></script>
+  <script src="js/shop.js"></script>
+  <script type="module" src="js/tryon.js"></script>
+</body>
+</html>
