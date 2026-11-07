@@ -465,8 +465,14 @@ function showResult(res) {
   $("#aiResultImg").src = res.src;
   $("#aiBeforeImg").src = res.before;
   $("#aiResultName").textContent = res.name;
-  setBA(50);
+  setCompare(false); // avval natija to'liq ko'rinadi; solishtirish — tugma bilan
   $("#aiResult").classList.add("is-on");
+}
+function setCompare(on) {
+  $("#ba").classList.toggle("is-compare", on);
+  $("#aiCmpToggle").classList.toggle("pill--red", on);
+  $("#aiCmpToggle").textContent = on ? "✓ Natijani ko'rish" : "◐ Oldin / Keyin";
+  setBA(on ? 50 : 0);
 }
 function setBA(v) {
   $("#baRange").value = v;
@@ -625,6 +631,7 @@ $("#aiErrorClose").addEventListener("click", hideResult);
 $("#aiSave").addEventListener("click", () => shown && download(shown.src, `kiyim-ai-${shown.pid}.png`));
 $("#aiAdd").addEventListener("click", () => shown && window.Cart.add(shown.pid));
 $("#baRange").addEventListener("input", (e) => setBA(+e.target.value));
+$("#aiCmpToggle").addEventListener("click", () => setCompare(!$("#ba").classList.contains("is-compare")));
 
 $("#resStrip").addEventListener("click", (e) => {
   const b = e.target.closest("button[data-res]");

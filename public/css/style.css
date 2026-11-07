@@ -215,6 +215,7 @@ svg { display: block; }
 .ba__label--r { right: 22px; }
 .ba__range { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: ew-resize; margin: 0; -webkit-appearance: none; appearance: none; }
 .ai-result .ai-result__tag, .ai-result .ai-result__bar { z-index: 2; }
+.ba:not(.is-compare) .ba__line, .ba:not(.is-compare) .ba__label, .ba:not(.is-compare) .ba__range, .ba:not(.is-compare) .ba__before { display: none; }
 
 /* ---------- AI natijalarini solishtirish ---------- */
 .ai-compare { position: absolute; inset: 0; display: none; flex-direction: column; gap: 14px; padding: 22px 22px 84px; background: #050507; z-index: 4; }
