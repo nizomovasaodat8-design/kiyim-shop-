@@ -141,9 +141,26 @@
         </div>
       </div>
 
-      <!-- AI natijasi -->
+      <!-- AI uchun 3-2-1 sanoq -->
+      <div class="countdown" id="countdown">
+        <b class="countdown__num" id="cdNum">3</b>
+        <p class="countdown__msg" id="cdMsg">Qimirlamang</p>
+        <div class="countdown__bar">
+          <button class="pill" id="cdCancel">Bekor qilish</button>
+          <button class="pill is-off" id="cdNow">Hozir olish</button>
+        </div>
+      </div>
+
+      <!-- AI natijasi: oldin / keyin -->
       <div class="ai-result" id="aiResult">
-        <img id="aiResultImg" alt="AI natija">
+        <div class="ba" id="ba">
+          <img id="aiResultImg" alt="AI natija">
+          <img id="aiBeforeImg" class="ba__before" alt="Oldin">
+          <div class="ba__line"><span>⟷</span></div>
+          <span class="ba__label ba__label--l mono">Oldin</span>
+          <span class="ba__label ba__label--r mono">Keyin</span>
+          <input type="range" class="ba__range" id="baRange" min="0" max="100" value="50" aria-label="Oldin va keyin solishtirish">
+        </div>
         <div class="ai-result__tag">✦ AI · <span id="aiResultName"></span></div>
         <div class="ai-result__bar">
           <button class="pill" id="aiBack">← Jonli rejim</button>
@@ -151,6 +168,13 @@
           <button class="pill" id="aiSave">⤓ Saqlash</button>
           <button class="pill pill--red" id="aiAdd">+ Savatga</button>
         </div>
+      </div>
+
+      <!-- AI natijalarini yonma-yon solishtirish -->
+      <div class="ai-compare" id="aiCompare">
+        <p class="kicker ai-compare__title">Qaysi biri sizga ko'proq yarashdi?</p>
+        <div class="ai-compare__grid" id="cmpGrid"></div>
+        <div class="ai-result__bar"><button class="pill" id="cmpClose">← Orqaga</button></div>
       </div>
 
       <!-- AI xatosi -->
@@ -177,8 +201,38 @@
           ⤒ Rasm yuklash
           <input type="file" id="uploadInput" accept="image/*" hidden>
         </label>
-        <p class="mono ai-box__note">Kameraga to'liq ko'rinib turing yoki o'z rasmingizni yuklang. Natija ~15–40 soniyada tayyor. Bepul AI kiyim, ko'ylak va shimlarni kiydiradi.</p>
+        <p class="mono ai-box__note">Tugmani bosing — 3 soniya sanoqdan keyin surat olinadi. Natija ~15–40 soniyada tayyor. O'z rasmingizni ham yuklashingiz mumkin.</p>
       </div>
+
+      <!-- AI natijalarim -->
+      <div class="results" id="results" hidden>
+        <div class="panel__row mono">
+          <span>Natijalarim</span>
+          <button class="link-btn" id="cmpOpen">Solishtirish →</button>
+        </div>
+        <div class="results__strip" id="resStrip"></div>
+      </div>
+
+      <!-- Jonli rejimdagi to'plam -->
+      <div class="outfit" id="outfit" hidden>
+        <div class="panel__row mono">
+          <span>To'plam · jonli</span>
+          <button class="link-btn" id="outfitClear">Tozalash</button>
+        </div>
+        <div class="outfit__list" id="outfitList"></div>
+        <button class="btn btn--ghost btn--full" id="outfitAdd">To'plamni savatga</button>
+      </div>
+
+      <!-- O'lcham tavsiyasi -->
+      <details class="size" id="sizeBox">
+        <summary>📏 O'lchamimni aniqlash</summary>
+        <p class="mono size__note">Bo'yingizni yozing va kameradan 2–3 qadam orqaga turing — boshdan oyoqqacha ko'rining.</p>
+        <div class="size__row">
+          <input id="sizeHeight" type="number" inputmode="numeric" min="120" max="220" placeholder="Bo'yingiz, sm">
+          <button class="btn btn--light" id="sizeBtn">O'lchash</button>
+        </div>
+        <p class="size__out" id="sizeOut" hidden></p>
+      </details>
 
       <div class="panel__row mono">
         <span>Keyingisi</span><span>← → almashtirish</span>

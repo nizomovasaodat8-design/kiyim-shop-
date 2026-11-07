@@ -28,9 +28,10 @@ Brauzerda **http://localhost:3000** manzilini oching.
 
 | Qism | Qanday ishlaydi |
 |---|---|
-| Katalog | 28 ta haqiqiy kiyim surati, 7 ta kategoriya |
-| Jonli kiyib ko'rish | Kamera + MediaPipe Pose → kiyimning foni olib tashlangan surati tanangizga yopishadi |
-| AI kiyib ko'rish | Kameradan kadr (yoki yuklangan rasm) + kiyim surati → Gemini → siz shu kiyimda |
+| Katalog | 42 ta kiyim surati, 8 ta kategoriya (shu jumladan ❄ Qish kolleksiyasi) |
+| Jonli kiyib ko'rish | Kamera + MediaPipe Pose → kiyimning foni olib tashlangan surati tanaga moslab egiladi (yelka → bel, bel → to'piq). Bir vaqtda bir nechta buyum (kurtka + shim + kepka) — "To'plam" |
+| AI kiyib ko'rish | 3-2-1 sanoq, tana kadrda to'liq ko'rinsagina surat olinadi → Gemini → "Oldin / Keyin" slayderi. Natijalar saqlanadi va yonma-yon solishtiriladi |
+| O'lcham tavsiyasi | Bo'y (sm) + kamera → yelka kengligi → taxminiy XS…XXL |
 | Savat | Brauzerda saqlanadi, sonini o'zgartirish mumkin |
 | Buyurtma | Ism, telefon, manzil → `data/orders.json` ga yoziladi (+ Telegramga xabar) |
 | Admin | http://localhost:3000/admin.html — buyurtmalar ro'yxati (parol bilan) |
