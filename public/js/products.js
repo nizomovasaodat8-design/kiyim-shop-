@@ -14,6 +14,7 @@
 
 const CATEGORIES = [
   { id: "all",       name: "Hammasi" },
+  { id: "qish",      name: "❄ Qish kolleksiyasi" },
   { id: "ustki",     name: "Ustki kiyim" },
   { id: "koylak",    name: "Ko'ylaklar" },
   { id: "jinsi",     name: "Shimlar" },
@@ -32,6 +33,23 @@ const P = (id, photo, data) => ({
 });
 
 const PRODUCTS = [
+  // ---- ❄ Qish kolleksiyasi (premium) ----
+  // Suratlar: Pexels (bepul litsenziya). Modelda kiyilgan suratlar — shuning uchun faqat AI rejimda.
+  P(29, "px-36018377", { cat: "qish", type: "top",   live: false, name: "Qora mat puffer kurtka",          price: 2390000, isNew: true }),
+  P(30, "px-14991031", { cat: "qish", type: "top",   live: false, name: "Krem qisqa puffer",               price: 2290000, isNew: true }),
+  P(31, "px-6764036",  { cat: "qish", type: "top",   live: false, name: "Ko'k gradient oversize puffer",   price: 2150000 }),
+  P(32, "px-21567458", { cat: "qish", type: "top",   live: false, name: "Havorang puffer kurtka",          price: 1990000 }),
+  P(33, "px-28969183", { cat: "qish", type: "top",   live: false, name: "Bej teddy palto",                 price: 2790000, isNew: true }),
+  P(34, "px-8360771",  { cat: "qish", type: "top",   live: false, name: "Uzun qora jun palto",             price: 3490000, isNew: true }),
+  P(35, "px-35140368", { cat: "qish", type: "top",   live: false, name: "Qora klassik palto",              price: 2990000 }),
+  P(36, "px-14707853", { cat: "qish", type: "top",   live: false, name: "Qo'y junli aviator kurtka",       price: 3690000, isNew: true }),
+  P(37, "px-3265546",  { cat: "qish", type: "top",   live: false, name: "Qora oversize gorlo sviter",      price: 890000 }),
+  P(38, "px-29047225", { cat: "qish", type: "dress", live: false, name: "Qizil-qora trikotaj ko'ylak",     price: 1190000 }),
+  P(39, "px-26851193", { cat: "qish", type: "shoes", live: false, name: "Jigarrang charm botilon",         price: 1890000 }),
+  P(40, "px-26851201", { cat: "qish", type: "shoes", live: false, name: "Qora tasmali botilon",            price: 1890000 }),
+  P(41, "px-27598915", { cat: "qish", type: "shoes", live: false, name: "Qora baland charm etik",          price: 2490000, isNew: true }),
+  P(42, "px-18310498", { cat: "qish", type: "hat",   live: false, name: "Qora beanie shapka",              price: 290000 }),
+
   // ---- Ustki kiyim ----
   P(1,  "1611312449408-fcece27cdbb7", { cat: "ustki",  type: "top",   live: true,  name: "Velvet yoqali jinsi kurtka", price: 1676000, isNew: true, fit: { w: 1.6, y: 0.2 } }),
   P(2,  "1591047139829-d91aecb6caea", { cat: "ustki",  type: "top",   live: true,  name: "Terrakota bomber",          price: 1880000, fit: { w: 1.65, y: 0.22 } }),

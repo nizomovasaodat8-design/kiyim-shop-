@@ -65,4 +65,4 @@ Sayt Node.js serverda ishlaydi, shuning uchun Render, Railway yoki VPS hosting k
 
 ## Suratlar
 
-Mahsulot suratlari [Unsplash](https://unsplash.com) saytidan olingan (Unsplash litsenziyasi — bepul foydalanish mumkin). Haqiqiy do'kon uchun o'z mahsulotlaringiz suratlarini qo'yasiz.
+Mahsulot suratlari [Unsplash](https://unsplash.com) va [Pexels](https://www.pexels.com) saytlaridan olingan (ikkalasining litsenziyasi ham bepul, tijoratda foydalanish mumkin). Qish kolleksiyasi suratlari Pexels’dan (`px-` bilan boshlanadi). Haqiqiy do'kon uchun o'z mahsulotlaringiz suratlarini qo'yasiz.
