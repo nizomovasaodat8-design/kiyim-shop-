@@ -204,18 +204,9 @@ svg { display: block; }
 .countdown__bar { display: flex; gap: 8px; margin-top: 6px; }
 @keyframes cd-pop { from { transform: scale(1.5); opacity: 0; } 30% { opacity: 1; } to { transform: scale(1); } }
 
-/* ---------- AI natija: oldin / keyin ---------- */
-.ba { --pos: 50%; position: absolute; inset: 0; background: #000; user-select: none; }
+.ba { position: absolute; inset: 0; background: #000; }
 .ba img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
-.ba__before { clip-path: inset(0 calc(100% - var(--pos)) 0 0); }
-.ba__line { position: absolute; top: 0; bottom: 0; left: var(--pos); width: 2px; margin-left: -1px; background: #fff; box-shadow: 0 0 12px rgba(0,0,0,.5); pointer-events: none; }
-.ba__line span { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 44px; height: 44px; border-radius: 50%; background: #fff; color: #111; display: grid; place-items: center; font-size: 18px; box-shadow: 0 4px 16px rgba(0,0,0,.4); }
-.ba__label { position: absolute; top: 74px; padding: 5px 10px; border-radius: 99px; background: rgba(0,0,0,.55); color: #fff; pointer-events: none; }
-.ba__label--l { left: 22px; }
-.ba__label--r { right: 22px; }
-.ba__range { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: ew-resize; margin: 0; -webkit-appearance: none; appearance: none; }
 .ai-result .ai-result__tag, .ai-result .ai-result__bar { z-index: 2; }
-.ba:not(.is-compare) .ba__line, .ba:not(.is-compare) .ba__label, .ba:not(.is-compare) .ba__range, .ba:not(.is-compare) .ba__before { display: none; }
 
 /* ---------- AI natijalarini solishtirish ---------- */
 .ai-compare { position: absolute; inset: 0; display: none; flex-direction: column; gap: 14px; padding: 22px 22px 84px; background: #050507; z-index: 4; }
@@ -275,7 +266,5 @@ svg { display: block; }
   .tryon__badge { top: 14px; left: 12px; font-size: 12px; }
   .ai-compare { padding: 14px 10px 76px; }
   .ai-compare__grid { grid-template-columns: repeat(2, 1fr); }
-  .ba__label { top: 66px; }
-  .ba__label--l { left: 12px; } .ba__label--r { right: 12px; }
   .footer { padding: 24px 16px; }
 }

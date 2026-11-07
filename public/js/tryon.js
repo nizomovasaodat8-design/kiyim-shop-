@@ -9,7 +9,7 @@
 //  2) AI rejim (haqiqiy ko'rinish):
 //     3-2-1 sanoq → tana kadrda to'liq ko'rinsa, bitta kadr olinadi →
 //     serverga (/api/tryon) yuboriladi → Gemini "shu odam shu kiyimda" rasmini qaytaradi.
-//     Natija "oldin / keyin" slayderi bilan ko'rsatiladi va solishtirish uchun saqlanadi.
+//     Natija kiyim butun odamda to'liq ko'rsatiladi va solishtirish uchun saqlanadi.
 //
 //  3) O'lcham tavsiyasi:
 //     bo'y (sm) + MediaPipe'ning metrdagi 3D nuqtalari → yelka kengligi → S/M/L…
@@ -421,7 +421,7 @@ function shoot() {
 
 // ---------- SO'ROV ----------
 let lastPerson = null;
-const results = []; // { pid, name, price, src, before }
+const results = []; // { pid, name, price, src }
 
 async function runAI(person) {
   if (!aiEnabled) {
@@ -443,7 +443,7 @@ async function runAI(person) {
     });
     const data = await r.json();
     if (!r.ok) throw new Error(data.error || "Server xatosi");
-    const res = { pid: product.id, name: product.name, price: product.price, src: data.image, before: person };
+    const res = { pid: product.id, name: product.name, price: product.price, src: data.image };
     results.unshift(res);
     if (results.length > 8) results.pop();
     renderResults();
@@ -457,26 +457,14 @@ async function runAI(person) {
   }
 }
 
-// ---------- NATIJA: OLDIN / KEYIN ----------
+// ---------- NATIJA (kiyim butun odamda, to'liq) ----------
 let shown = null;
 function showResult(res) {
   shown = res;
   $("#aiCompare").classList.remove("is-on");
   $("#aiResultImg").src = res.src;
-  $("#aiBeforeImg").src = res.before;
   $("#aiResultName").textContent = res.name;
-  setCompare(false); // avval natija to'liq ko'rinadi; solishtirish — tugma bilan
   $("#aiResult").classList.add("is-on");
-}
-function setCompare(on) {
-  $("#ba").classList.toggle("is-compare", on);
-  $("#aiCmpToggle").classList.toggle("pill--red", on);
-  $("#aiCmpToggle").textContent = on ? "✓ Natijani ko'rish" : "◐ Oldin / Keyin";
-  setBA(on ? 50 : 0);
-}
-function setBA(v) {
-  $("#baRange").value = v;
-  $("#ba").style.setProperty("--pos", `${v}%`);
 }
 function hideResult() {
   $("#aiResult").classList.remove("is-on");
@@ -630,8 +618,6 @@ $("#aiBack").addEventListener("click", hideResult);
 $("#aiErrorClose").addEventListener("click", hideResult);
 $("#aiSave").addEventListener("click", () => shown && download(shown.src, `kiyim-ai-${shown.pid}.png`));
 $("#aiAdd").addEventListener("click", () => shown && window.Cart.add(shown.pid));
-$("#baRange").addEventListener("input", (e) => setBA(+e.target.value));
-$("#aiCmpToggle").addEventListener("click", () => setCompare(!$("#ba").classList.contains("is-compare")));
 
 $("#resStrip").addEventListener("click", (e) => {
   const b = e.target.closest("button[data-res]");
