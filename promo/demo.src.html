@@ -137,6 +137,8 @@ html, body { background: #000; overflow: hidden; }
     <div id="endTag" class="abs serif" style="left:540px;top:1060px;transform:translateX(-50%);font-size:76px;color:#e6e4df">kiyib ko'ring, keyin sotib oling</div>
     <div id="endRule" class="abs" style="left:240px;top:1200px;width:600px;height:2px;background:rgba(255,255,255,.5);transform-origin:50% 50%"></div>
     <div id="endUrl" class="abs mono" style="left:540px;top:1240px;transform:translateX(-50%);font-size:34px;color:#cfcdc8"></div>
+    <div id="endPhoneK" class="abs mono" style="left:540px;top:1370px;transform:translateX(-50%);font-size:26px;color:var(--red)">Bog'lanish</div>
+    <div id="endPhone" class="abs" style="left:540px;top:1420px;transform:translateX(-50%);font-size:78px;font-weight:600;letter-spacing:.02em">+998 99 001 49 44</div>
   </div>
 
   <!-- flood / wipe layer -->
@@ -152,7 +154,7 @@ html, body { background: #000; overflow: hidden; }
   </div>
 </div>
 
-<div id="ui" hidden><button id="playBtn">▶ Play</button><input id="scrub" type="range" min="0" max="15" step="0.01" value="0"><span id="tlabel">0.00</span></div>
+<div id="ui" hidden><button id="playBtn">▶ Play</button><input id="scrub" type="range" min="0" max="16.875" step="0.01" value="0"><span id="tlabel">0.00</span></div>
 
 <script>
 /* ============================================================
@@ -172,8 +174,9 @@ html, body { background: #000; overflow: hidden; }
    11.25   S6 feature list slams in, 1/2 beat each                blips
    12.85   red flood from bottom                                  riser + impact
    13.125  S7 end card: Kiyim. + tagline + URL typing             impact, ring-out, typing blips
+   14.875  phone number +998 99 001 49 44 rises in, hold to 16.875 chime
    ============================================================ */
-const VIDEO = { w: 1080, h: 1920, duration: 15 };
+const VIDEO = { w: 1080, h: 1920, duration: 16.875 };
 window.VIDEO = VIDEO;
 const BPM = 128, B = 60 / BPM, BAR = B * 4;
 
@@ -200,7 +203,7 @@ const inRange = (t, a, b) => t >= a && t < b;
 // ---------- timeline ----------
 const T = {
   s2: BAR, dotGo: BAR + 3 * B, s3a: 2 * BAR, s3b: 2 * BAR + 2 * B, s3c: 2 * BAR + 4 * B,
-  s4: 3 * BAR + 2 * B, s5: 5 * BAR, s6: 6 * BAR, flood7: 7 * BAR - 0.6 * B, s7: 7 * BAR, end: 15,
+  s4: 3 * BAR + 2 * B, s5: 5 * BAR, s6: 6 * BAR, flood7: 7 * BAR - 0.6 * B, s7: 7 * BAR, end: 16.875,
 };
 const SCENES = [
   [0, "01", "Spark"], [T.s2, "02", "Brand"], [T.s3a, "03", "Kinetic type"],
@@ -431,6 +434,10 @@ function seek(t) {
     const n = Math.floor(seg(t, T.s7 + 0.75, T.s7 + 1.55) * URL_TXT.length);
     const caret = Math.floor((t - T.s7) * 4) % 2 === 0 ? "▍" : " ";
     $("endUrl").textContent = URL_TXT.slice(0, n) + (n < URL_TXT.length || caret === "▍" ? caret : " ");
+    const ph = spring(t - T.s7 - 1.75, 14, 0.7);
+    $("endPhoneK").style.opacity = seg(t, T.s7 + 1.7, T.s7 + 1.9);
+    $("endPhone").style.opacity = clamp(ph * 1.5);
+    $("endPhone").style.transform = `translateX(-50%) translateY(${(1 - ph) * 40}px) scale(${lerp(0.9, 1, ph)})`;
   }
 
   // ---------- HUD ----------
@@ -481,7 +488,7 @@ window.buildAudio = async function (ctx) {
   const roots = [55, 43.65, 65.41, 49];
   for (let bar = 1; bar < 7; bar++) for (let k = 0; k < 8; k++) { const t = bar * BAR + k * B / 2; tone(t, B / 2 * 0.9, "sawtooth", roots[bar % 4], null, 0.12, music, 0.01); }
   // pad chord on the end card
-  for (const f of [220, 261.6, 329.6]) tone(T.s7, 1.9, "triangle", f, null, 0.05, music, 0.3);
+  for (const f of [220, 261.6, 329.6]) tone(T.s7, 3.6, "triangle", f, null, 0.05, music, 0.3);
 
   riser(0.1, BAR); tone(0.1, 0.08, "sine", 2000, 1800, 0.08);
   whoosh(0.85, 0.3); impact(T.s2);
@@ -498,6 +505,7 @@ window.buildAudio = async function (ctx) {
   riser(T.flood7 - 0.6, T.s7); impact(T.s7);
   for (let i = 0; i < URL_TXT.length; i++) blip(T.s7 + 0.75 + i * (0.8 / URL_TXT.length), 2400, 0.04);
   tone(T.s7 + 0.2, 1.6, "sine", 880, null, 0.08, fx, 0.01);
+  tone(T.s7 + 1.75, 0.5, "sine", 1318, null, 0.09); tone(T.s7 + 1.87, 0.8, "sine", 1760, null, 0.08); whoosh(T.s7 + 1.75, 0.25);
 };
 
 // ============================================================
