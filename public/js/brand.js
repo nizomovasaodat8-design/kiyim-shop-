@@ -8,7 +8,7 @@ const BRAND = {
   city: "Toshkent",
   delivery: "Toshkent bo'ylab yetkazib berish 1 kunda",
   payment: "To'lov: yetkazib berilganda naqd yoki karta orqali",
-  phone: "",                                       // masalan "+998 90 123 45 67" (bo'sh bo'lsa ko'rsatilmaydi)
+  phone: "+998 99 001 49 44",                      // masalan "+998 90 123 45 67" (bo'sh bo'lsa ko'rsatilmaydi)
   telegram: "",                                    // masalan "kiyim_shop" (@ belgisiz)
   instagram: "",                                   // masalan "kiyim.uz"
   accent: "#ff2a1f",                               // asosiy rang (tugmalar, belgilar)
