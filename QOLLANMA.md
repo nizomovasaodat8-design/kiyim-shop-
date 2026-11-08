@@ -29,7 +29,7 @@ Brauzerda **http://localhost:3000** manzilini oching.
 | Qism | Qanday ishlaydi |
 |---|---|
 | Katalog | 42 ta kiyim surati, 8 ta kategoriya (shu jumladan ❄ Qish kolleksiyasi) |
-| Jonli kiyib ko'rish | Kamera + MediaPipe Pose → kiyimning foni olib tashlangan surati tanaga moslab egiladi (yelka → bel, bel → to'piq). Bir vaqtda bir nechta buyum (kurtka + shim + kepka) — "To'plam" |
+| Jonli kiyib ko'rish | Kamera + MediaPipe Pose → kiyimning foni olib tashlangan surati tanaga moslab egiladi (yelka → bel, bel → to'piq). Bir vaqtda bir nechta buyum (kurtka + shim + kepka) — "To'plam". ⇆ Yonma-yon: bitta jonli videoda ikki kiyim. Telefonda ⟲ Kamera — orqa kamera (ko'zguga qaratib) |
 | AI kiyib ko'rish | 3-2-1 sanoq, tana kadrda to'liq ko'rinsagina surat olinadi → Gemini → kiyim butun odamda. Natijalar saqlanadi va yonma-yon solishtiriladi |
 | O'lcham tavsiyasi | Bo'y (sm) + kamera → yelka kengligi → taxminiy XS…XXL |
 | Savat | Brauzerda saqlanadi, sonini o'zgartirish mumkin |

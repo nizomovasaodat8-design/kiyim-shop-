@@ -123,7 +123,17 @@
       <div class="tryon__badge" id="badge">✦ Jonli rejim</div>
       <div class="tryon__hint" id="hint">Chiziqlar ichiga turing</div>
 
+      <!-- jonli rejim: tez almashtirish va yonma-yon solishtirish -->
+      <button class="stage-arrow stage-arrow--l" id="stagePrev" aria-label="Oldingi kiyim">‹</button>
+      <button class="stage-arrow stage-arrow--r" id="stageNext" aria-label="Keyingi kiyim">›</button>
+      <div class="now-name" id="nowName"></div>
+      <span class="cmp-name cmp-name--l" id="cmpNameL"></span>
+      <span class="cmp-name cmp-name--r" id="cmpNameR"></span>
+      <div class="toast" id="toast" role="status"></div>
+
       <div class="tryon__top">
+        <button class="pill" id="camSwitch" hidden>⟲ Kamera</button>
+        <button class="pill" id="cmpToggle">⇆ Yonma-yon</button>
         <button class="pill" id="toggleGuide">Chiziqlar</button>
         <button class="pill pill--red" id="snap">● Surat</button>
         <button class="icon-btn" id="tryonClose">✕</button>

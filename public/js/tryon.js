@@ -81,24 +81,58 @@ function closeTryOn() {
 }
 
 // ---------- KAMERA ----------
+// "user" — old (selfi) kamera, ko'zgudek teskari ko'rsatiladi.
+// "environment" — orqa kamera: ko'zguga qaratib yoki boshqa odam ushlab turadi; teskari qilinmaydi.
+let facing = "user";
+try { facing = localStorage.getItem("kiyim-facing") || "user"; } catch {}
+const mirrored = () => facing === "user";
+
 async function startCamera() {
   setStatus("Kamera ishga tushmoqda…");
+  stream?.getTracks().forEach((t) => t.stop());
   try {
     stream = await navigator.mediaDevices.getUserMedia({
-      video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: "user" },
+      video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: { ideal: facing } },
       audio: false,
     });
     video.srcObject = stream;
     await video.play();
-    running = true;
-    setStatus("Tana modelini yuklayapmiz…");
-    requestAnimationFrame(loop);
+    smooth = null;
+    if (!running) { running = true; requestAnimationFrame(loop); }
+    setStatus(pose ? "" : "Tana modelini yuklayapmiz…");
+    showCamSwitch();
     return true;
   } catch (err) {
     console.error(err);
     setStatus("Kamera ochilmadi. Ruxsat bering yoki pastdagi “Rasm yuklash” orqali AI rejimdan foydalaning.");
     return false;
   }
+}
+
+// Kamera bittadan ko'p bo'lsa (telefon) — "Kamera" tugmasini ko'rsatamiz
+async function showCamSwitch() {
+  try {
+    const cams = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === "videoinput");
+    $("#camSwitch").hidden = cams.length < 2;
+  } catch { $("#camSwitch").hidden = true; }
+}
+
+async function switchCamera() {
+  facing = facing === "user" ? "environment" : "user";
+  try { localStorage.setItem("kiyim-facing", facing); } catch {}
+  await startCamera();
+  toast(facing === "environment"
+    ? "Orqa kamera: telefonni ko'zguga qarating yoki birovdan ushlab turishini so'rang — butun tanangiz ko'rinsin"
+    : "Old kamera");
+}
+
+let toastTimer = null;
+function toast(msg) {
+  const t = $("#toast");
+  t.textContent = msg;
+  t.classList.add("is-on");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("is-on"), 4500);
 }
 
 async function loadPose() {
@@ -119,12 +153,13 @@ async function loadPose() {
 }
 
 // ---------- ASOSIY SIKL ----------
+let cmpOn = false, prevItem = null; // yonma-yon: chapda — oldingi buyum, o'ngda — hozirgisi
+
 function loop() {
   if (!running) return;
   fitCanvas();
-  const view = drawVideo();
 
-  if (pose && video.currentTime !== lastTime) {
+  if (pose && video.readyState >= 2 && video.currentTime !== lastTime) {
     lastTime = video.currentTime;
     const res = pose.detectForVideo(video, performance.now());
     const lm = res.landmarks?.[0];
@@ -133,20 +168,54 @@ function loop() {
   }
 
   const found = !!smooth && visible(smooth[11]) && visible(smooth[12]);
-  const wearing = Object.keys(outfit).length > 0;
-  $("#guide").classList.toggle("is-hidden", !showGuide || found);
-  $("#hint").textContent = current.live ? "Chiziqlar ichiga turing" : "Bu buyum AI rejimda kiyiladi ↓";
-  $("#hint").classList.toggle("is-hidden", current.live ? found || !showGuide : false);
-  $("#badge").textContent = found ? "✦ Jonli rejim · tana topildi" : "✦ Jonli rejim";
+  const split = cmpOn && prevItem && prevItem.live;
+  $("#guide").classList.toggle("is-hidden", !showGuide || found || split);
+  $("#hint").textContent = !current.live ? "Bu buyum faqat AI rejimda kiyiladi ↓"
+    : cmpOn && !split ? "Yana bitta kiyim tanlang — ikkalasi yonma-yon chiqadi"
+    : "Butun tanangiz ko'rinsin — kiyim siz bilan birga harakatlanadi";
+  $("#hint").classList.toggle("is-hidden", current.live && !(cmpOn && !split) ? found || !showGuide : false);
+  $("#badge").textContent = found ? "✦ Jonli · tana topildi" : "✦ Jonli rejim";
+  $(".tryon__stage").classList.toggle("is-split", !!split);
 
-  if (found && wearing) {
+  const cw = canvas.width, ch = canvas.height;
+  if (split) {
+    // Bitta jonli videoni ikki yarmiga chizamiz: har birida boshqa kiyim
+    const half = Math.round(cw / 2);
+    renderView({ x0: 0, w: half, h: ch }, found, outfitWith(prevItem));
+    renderView({ x0: half, w: cw - half, h: ch }, found, outfit);
+    ctx.fillStyle = "rgba(255,255,255,.9)";
+    ctx.fillRect(half - 1, 0, 2, ch);
+    $("#cmpNameL").textContent = prevItem.name;
+    $("#cmpNameR").textContent = current.live ? current.name : "—";
+  } else {
+    renderView({ x0: 0, w: cw, h: ch }, found, outfit);
+  }
+  requestAnimationFrame(loop);
+}
+
+function renderView(region, found, look) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(region.x0, 0, region.w, region.h);
+  ctx.clip();
+  const view = drawVideo(region);
+  if (found) {
     for (const slot of DRAW_ORDER) {
-      const p = outfit[slot];
+      const p = look[slot];
       const img = p && garment(p);
       if (img?.complete && img.naturalWidth) drawOnBody(smooth, view, p, img);
     }
   }
-  requestAnimationFrame(loop);
+  ctx.restore();
+}
+
+// To'plamning nusxasi, bitta joyi boshqa buyum bilan almashtirilgan
+function outfitWith(p) {
+  const o = { ...outfit };
+  if (p.type === "dress") delete o.pants;
+  if (p.type === "pants" && o.top?.type === "dress") delete o.top;
+  o[SLOT[p.type]] = p;
+  return o;
 }
 
 function fitCanvas() {
@@ -156,32 +225,37 @@ function fitCanvas() {
   if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
 }
 
-function drawVideo() {
-  const cw = canvas.width, ch = canvas.height;
+// Videoni berilgan maydonga "cover" qilib chizadi (old kamerada — ko'zgudek)
+function drawVideo({ x0, w: cw, h: ch }) {
   const vw = video.videoWidth || 1280, vh = video.videoHeight || 720;
   const s = Math.max(cw / vw, ch / vh);
   const dx = (cw - vw * s) / 2, dy = (ch - vh * s) / 2;
+  const mirror = mirrored();
   ctx.save();
-  ctx.translate(cw, 0);
-  ctx.scale(-1, 1); // ko'zgu effekti
+  ctx.translate(x0, 0);
+  if (mirror) { ctx.translate(cw, 0); ctx.scale(-1, 1); }
   ctx.drawImage(video, dx, dy, vw * s, vh * s);
   ctx.restore();
-  return { cw, vw, vh, s, dx, dy };
+  return { x0, cw, vw, vh, s, dx, dy, mirror };
 }
 
-const toPx = (p, v) => ({ x: v.cw - (v.dx + p.x * v.vw * v.s), y: v.dy + p.y * v.vh * v.s });
+const toPx = (p, v) => {
+  const x = v.dx + p.x * v.vw * v.s;
+  return { x: v.x0 + (v.mirror ? v.cw - x : x), y: v.dy + p.y * v.vh * v.s };
+};
 const visible = (p) => p && (p.visibility ?? 1) > 0.5;
 const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 const dist3 = (a, b) => Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z);
 const mid = (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2, z: ((a.z ?? 0) + (b.z ?? 0)) / 2 });
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+const lerp = (a, b, t) => a + (b - a) * t;
 const level = (a, b) => { // ikki nuqta orasidagi qiyalik (doim -90°..90°)
   let ang = Math.atan2(b.y - a.y, b.x - a.x);
   if (Math.abs(ang) > Math.PI / 2) ang -= Math.PI * Math.sign(ang);
   return ang;
 };
 
-function smoothLandmarks(prev, next, k = 0.55) {
+function smoothLandmarks(prev, next, k = 0.5) {
   if (!prev) return next.map((p) => ({ ...p }));
   return next.map((p, i) => ({
     x: prev[i].x * k + p.x * (1 - k),
@@ -197,9 +271,14 @@ function garment(p) {
 }
 
 // ---------- KIYIMNI TANAGA JOYLASH ----------
+//  fit (products.js) — kiyim suratidagi tana nuqtalari, 0..1 ulushlarda:
+//   y / x   — yuqori tayanch (ustki kiyim: yelkalar o'rtasi; shim: bel; shapka: peshona)
+//   y2 / x2 — pastki tayanch (ustki kiyim: son bo'g'imlari; shim: to'piqlar)
+//   w       — surat kengligi = tana o'lchovi (yelka/son/quloq oralig'i) × w
+//   a       — suratdagi model yelkalarining qiyaligi (radian), shuni to'g'rilaymiz
 function drawOnBody(lm, v, p, img) {
   const P = (i) => toPx(lm[i], v);
-  const f = { ...FIT[p.type], ...p.fit };
+  const f = { x: 0.5, a: 0, ...FIT[p.type], ...p.fit };
   const ls = P(11), rs = P(12);
   const sw = dist(ls, rs), sMid = mid(ls, rs);
   const hipsOk = visible(lm[23]) && visible(lm[24]);
@@ -215,13 +294,13 @@ function drawOnBody(lm, v, p, img) {
       const waist = { x: hMid.x, y: hMid.y - hw * 0.15 };
       const anklesOk = visible(lm[27]) && visible(lm[28]);
       const kneesOk = visible(lm[25]) && visible(lm[26]);
-      if (!hipsOk || !(anklesOk || kneesOk)) return place(img, waist, hw * f.w, f.y, hA);
+      if (!hipsOk || !(anklesOk || kneesOk)) return place(img, waist, hw * f.w, f.y, hA, f.x);
       const end = anklesOk ? mid(P(27), P(28)) : mid(P(25), P(26));
       return warpLegs(img, f, { waist, end, endFrac: anklesOk ? 1 : 0.55, hw, hA });
     }
     case "hat": {
       const le = P(7), re = P(8), head = dist(le, re), eyes = mid(P(2), P(5));
-      return place(img, { x: eyes.x, y: eyes.y - head * 0.3 }, head * f.w, f.y, level(le, re));
+      return place(img, { x: eyes.x, y: eyes.y - head * 0.3 }, head * f.w, f.y, level(le, re) - f.a, f.x);
     }
     case "glasses": {
       const lo = P(3), ro = P(6);
@@ -239,49 +318,53 @@ function drawOnBody(lm, v, p, img) {
 }
 
 // Rasmni tabiiy nisbatida (cho'zmasdan) joylash — shapka, ko'zoynak, sumka, poyabzal uchun
-function place(img, anchor, w, anchorY, angle) {
+function place(img, anchor, w, anchorY, angle, anchorX = 0.5) {
   const h = w * (img.naturalHeight / img.naturalWidth);
   ctx.save();
   ctx.translate(anchor.x, anchor.y);
   ctx.rotate(angle);
   ctx.shadowColor = "rgba(0,0,0,.35)";
   ctx.shadowBlur = 16;
-  ctx.drawImage(img, -w / 2, -h * anchorY, w, h);
+  ctx.drawImage(img, -w * anchorX, -h * anchorY, w, h);
   ctx.restore();
 }
 
 // Rasmni gorizontal "tasma"larga bo'lib chizadi. Har bir tasma o'z markazi,
 // burchagi va kengligi bilan — natijada kiyim tana bilan birga egiladi va buriladi.
-//   at(u) → { x, y, ang, sc }  (u: 0 — yuqori tayanch nuqta, 1 — pastki)
+//   at(u) → { x, y, ang, sc, fx }  (u: 0 — yuqori tayanch, 1 — pastki; fx — suratdagi markaz ulushi)
 function drawStrips(img, w, h, anchorY, length, at) {
-  const iw = img.naturalWidth, ih = img.naturalHeight, N = 28;
+  const iw = img.naturalWidth, ih = img.naturalHeight, N = 32;
   const stripH = h / N;
-  ctx.save();
+  const base = ctx.getTransform();
   for (let i = 0; i < N; i++) {
     const t = i / N;
     const u = ((t - anchorY) * h) / length;
-    const { x, y, ang, sc } = at(u);
-    ctx.setTransform(1, 0, 0, 1, x, y);
+    const { x, y, ang, sc, fx = 0.5 } = at(u);
+    ctx.setTransform(base);
+    ctx.translate(x, y);
     ctx.rotate(ang);
-    ctx.drawImage(img, 0, t * ih, iw, ih / N + 0.5, (-w * sc) / 2, 0, w * sc, stripH + 1.2);
+    ctx.drawImage(img, 0, t * ih, iw, ih / N + 0.5, -w * sc * fx, 0, w * sc, stripH + 1.2);
   }
-  ctx.restore();
+  ctx.setTransform(base);
 }
 
 // Ustki kiyim / ko'ylak: yelkadan belgacha
 function warpTorso(img, f, { sMid, hMid, sw, hw, sA, hA }) {
   const L = Math.max(dist(sMid, hMid), sw * 0.6);          // ekrandagi gavda uzunligi
-  const sv = clamp(L / (sw * 1.3), 0.8, 1.3);               // gavda kalta/uzun ko'rinsa — kiyim ham
   const ws = clamp(hw / 0.72 / sw, 0.88, 1.15);              // belga qarab torayish/kengayish
   const w = sw * f.w;
-  const h = w * (img.naturalHeight / img.naturalWidth) * sv;
+  let h;
+  if (f.y2 > f.y) h = L / (f.y2 - f.y);                      // suratdagi yelka→son = tanadagi yelka→son
+  else h = w * (img.naturalHeight / img.naturalWidth) * clamp(L / (sw * 1.3), 0.8, 1.3);
+  const x2 = f.x2 ?? f.x;
   drawStrips(img, w, h, f.y, L, (u) => {
     const k = clamp(u, 0, 1.6);
     return {
-      x: sMid.x + (hMid.x - sMid.x) * u,
-      y: sMid.y + (hMid.y - sMid.y) * u,
-      ang: sA + (hA - sA) * k,
+      x: lerp(sMid.x, hMid.x, u),
+      y: lerp(sMid.y, hMid.y, u),
+      ang: lerp(sA, hA, k) - f.a,
       sc: 1 + (ws - 1) * k,
+      fx: lerp(f.x, x2, clamp(u, 0, 1)),
     };
   });
 }
@@ -290,17 +373,23 @@ function warpTorso(img, f, { sMid, hMid, sw, hw, sA, hA }) {
 function warpLegs(img, f, { waist, end, endFrac, hw, hA }) {
   const legLen = dist(waist, end) / endFrac;                // beldan to'piqqacha taxminiy uzunlik
   const w = hw * f.w;
-  const h0 = w * (img.naturalHeight / img.naturalWidth);
-  const sv = clamp(legLen / ((0.97 - f.y) * h0), 0.7, 1.4);
-  const h = h0 * sv;
+  let h;
+  if (f.y2 > f.y) h = legLen / (f.y2 - f.y);
+  else {
+    const h0 = w * (img.naturalHeight / img.naturalWidth);
+    h = h0 * clamp(legLen / ((0.97 - f.y) * h0), 0.7, 1.4);
+  }
   const dx = (end.x - waist.x) / endFrac, dy = (end.y - waist.y) / endFrac;
+  const x2 = f.x2 ?? f.x;
   drawStrips(img, w, h, f.y, legLen, (u) => ({
     x: waist.x + dx * u,
     y: waist.y + dy * u,
     ang: hA * (1 - clamp(u, 0, 1)),
     sc: 1,
+    fx: lerp(f.x, x2, clamp(u, 0, 1)),
   }));
 }
+
 
 // ============================================================
 //  TO'PLAM (jonli rejimda bir nechta buyum)
@@ -343,8 +432,7 @@ function captureFrame() {
   c.width = Math.round(vw * scale);
   c.height = Math.round(vh * scale);
   const x = c.getContext("2d");
-  x.translate(c.width, 0);
-  x.scale(-1, 1);
+  if (mirrored()) { x.translate(c.width, 0); x.scale(-1, 1); }
   x.drawImage(video, 0, 0, c.width, c.height);
   return c.toDataURL("image/jpeg", 0.9);
 }
@@ -547,8 +635,11 @@ function measureSize() {
 //  MAHSULOTNI TANLASH
 // ============================================================
 function select(id) {
-  current = window.byId(id);
+  const next = window.byId(id);
+  if (current && current.id !== next.id && current.live) prevItem = current; // yonma-yon uchun
+  current = next;
   if (current.live) wear(current);
+  $("#nowName").innerHTML = `${current.name} <b>${formatPrice(current.price)}</b>`;
   const cat = CATEGORIES.find((c) => c.id === current.cat);
   $("#curImg").innerHTML = `<img src="${current.img}" alt="">`;
   $("#curCat").textContent = cat.name;
@@ -569,9 +660,18 @@ function renderMini() {
   renderOutfit();
 }
 
+// Keyingi / oldingi jonli kiyiladigan buyum (harakatlanib turib tez almashtirish uchun)
 function step(dir) {
-  const i = PRODUCTS.findIndex((p) => p.id === current.id);
-  select(PRODUCTS[(i + dir + PRODUCTS.length) % PRODUCTS.length].id);
+  const list = PRODUCTS.filter((p) => p.live);
+  const i = Math.max(0, list.findIndex((p) => p.id === current.id));
+  select(list[(i + dir + list.length) % list.length].id);
+}
+
+function toggleCompare() {
+  cmpOn = !cmpOn;
+  $("#cmpToggle").classList.toggle("pill--red", cmpOn);
+  $("#cmpToggle").textContent = cmpOn ? "✕ Yonma-yon" : "⇆ Yonma-yon";
+  if (cmpOn) toast(prevItem ? "Chapda — oldingi kiyim, o'ngda — hozirgisi. Harakat qilib ko'ring!" : "Endi boshqa kiyimni tanlang — ikkalasi yonma-yon chiqadi");
 }
 
 function setStatus(msg) {
@@ -600,6 +700,20 @@ $("#miniGrid").addEventListener("click", (e) => {
 $("#tryonClose").addEventListener("click", closeTryOn);
 $("#curAdd").addEventListener("click", () => window.Cart.add(current.id));
 $("#snap").addEventListener("click", snapshot);
+$("#camSwitch").addEventListener("click", switchCamera);
+$("#cmpToggle").addEventListener("click", toggleCompare);
+$("#stagePrev").addEventListener("click", () => { hideResult(); step(-1); });
+$("#stageNext").addEventListener("click", () => { hideResult(); step(1); });
+
+// Telefonda ekranni chapga/o'ngga surib kiyim almashtirish
+let touchX = null;
+canvas.addEventListener("touchstart", (e) => { touchX = e.touches[0].clientX; }, { passive: true });
+canvas.addEventListener("touchend", (e) => {
+  if (touchX == null) return;
+  const dx = e.changedTouches[0].clientX - touchX;
+  touchX = null;
+  if (Math.abs(dx) > 50) step(dx < 0 ? 1 : -1);
+});
 $("#toggleGuide").addEventListener("click", (e) => {
   showGuide = !showGuide;
   e.currentTarget.classList.toggle("is-off", !showGuide);

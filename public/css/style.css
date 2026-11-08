@@ -195,6 +195,23 @@ svg { display: block; }
 .ai-error p { max-width: 460px; text-align: center; line-height: 1.6; margin-bottom: 16px; padding: 0 16px; }
 .ai-error { text-align: center; }
 
+/* ---------- Jonli rejim: almashtirish, yonma-yon, xabar ---------- */
+.tryon__top { flex-wrap: wrap; justify-content: flex-end; max-width: calc(100% - 200px); }
+.tryon__top [hidden] { display: none; }
+.tryon__hint { bottom: 78px; }
+.stage-arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 48px; height: 48px; border-radius: 50%; background: rgba(0,0,0,.45); color: #fff; font-size: 30px; line-height: 1; display: grid; place-items: center; backdrop-filter: blur(6px); z-index: 2; }
+.stage-arrow:hover { background: rgba(0,0,0,.7); }
+.stage-arrow--l { left: 14px; }
+.stage-arrow--r { right: 14px; }
+.now-name { position: absolute; bottom: 22px; left: 50%; transform: translateX(-50%); padding: 9px 16px; border-radius: 99px; background: rgba(0,0,0,.6); backdrop-filter: blur(8px); font-size: 14px; white-space: nowrap; max-width: calc(100% - 140px); overflow: hidden; text-overflow: ellipsis; }
+.now-name b { font-weight: 500; color: #ffb3ae; margin-left: 6px; }
+.cmp-name { display: none; position: absolute; top: 64px; max-width: 44%; padding: 6px 12px; border-radius: 99px; background: rgba(0,0,0,.6); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cmp-name--l { left: 12px; }
+.cmp-name--r { right: 12px; background: var(--red); }
+.tryon__stage.is-split .cmp-name { display: block; }
+.toast { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(.96); max-width: min(440px, 86%); padding: 14px 18px; border-radius: 14px; background: rgba(0,0,0,.75); backdrop-filter: blur(10px); text-align: center; line-height: 1.5; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; z-index: 6; }
+.toast.is-on { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
 /* ---------- AI: 3-2-1 sanoq ---------- */
 .countdown { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: radial-gradient(ellipse at center, rgba(0,0,0,.15), rgba(0,0,0,.55)); z-index: 5; text-align: center; padding: 0 16px; }
 .countdown.is-on { display: flex; }
@@ -265,6 +282,13 @@ svg { display: block; }
   .tryon__top { top: 12px; right: 12px; }
   .tryon__badge { top: 14px; left: 12px; font-size: 12px; }
   .ai-compare { padding: 14px 10px 76px; }
+  .tryon__top { max-width: calc(100% - 172px); gap: 6px; }
+  .tryon__top .pill { height: 32px; padding: 0 11px; font-size: 10px; }
+  .stage-arrow { width: 40px; height: 40px; font-size: 26px; }
+  .stage-arrow--l { left: 8px; } .stage-arrow--r { right: 8px; }
+  .now-name { bottom: 12px; font-size: 13px; max-width: calc(100% - 110px); }
+  .tryon__hint { bottom: 60px; font-size: 13px; white-space: normal; text-align: center; width: max-content; max-width: 86%; }
+  .cmp-name { top: 98px; }
   .ai-compare__grid { grid-template-columns: repeat(2, 1fr); }
   .footer { padding: 24px 16px; }
 }
