@@ -3,3 +3,8 @@ data/
 node_modules/
 .claude/
 *.log
+promo/node_modules/
+promo/*.mp4
+promo/*.png
+promo/fonts/
+promo/demo.html

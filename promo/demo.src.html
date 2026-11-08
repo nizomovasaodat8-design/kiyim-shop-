@@ -1,0 +1,525 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kiyim promo</title>
+<style>
+@font-face { font-family: "Archivo Black"; src: url(%%FONT:ArchivoBlack-400.woff2%%) format("woff2"); font-weight: 400; }
+@font-face { font-family: "Instrument Serif"; src: url(%%FONT:InstrumentSerif-400i.woff2%%) format("woff2"); font-style: italic; font-weight: 400; }
+@font-face { font-family: "JetBrains Mono"; src: url(%%FONT:JetBrainsMono-500.woff2%%) format("woff2"); font-weight: 500; }
+@font-face { font-family: "Caveat"; src: url(%%FONT:Caveat-700.woff2%%) format("woff2"); font-weight: 700; }
+@font-face { font-family: "Inter"; src: url(%%FONT:Inter-500.woff2%%) format("woff2"); font-weight: 100 900; }
+
+:root { --ink: #0B0B0C; --red: #FF2A1F; --cream: #EDEBE4; --blue: #2F47FF; --white: #fff; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #000; overflow: hidden; }
+#stage { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; overflow: hidden; background: var(--ink); transform-origin: 0 0; font-family: Inter, sans-serif; color: var(--white); }
+.layer { position: absolute; inset: 0; }
+.abs { position: absolute; white-space: nowrap; }
+.mono { font-family: "JetBrains Mono", monospace; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; }
+.slam { font-family: "Archivo Black", sans-serif; text-transform: uppercase; line-height: .86; }
+.serif { font-family: "Instrument Serif", serif; font-style: italic; }
+.hand { font-family: "Caveat", cursive; font-weight: 700; }
+.center { left: 50%; top: 50%; transform: translate(-50%, -50%); }
+
+/* HUD */
+#hud { position: absolute; inset: 0; pointer-events: none; z-index: 40; }
+.br { position: absolute; width: 56px; height: 56px; border: 3px solid currentColor; opacity: .55; }
+.br.tl { left: 44px; top: 44px; border-right: 0; border-bottom: 0; }
+.br.tr { right: 44px; top: 44px; border-left: 0; border-bottom: 0; }
+.br.bl { left: 44px; bottom: 44px; border-right: 0; border-top: 0; }
+.br.brr { right: 44px; bottom: 44px; border-left: 0; border-top: 0; }
+.hudtxt { position: absolute; font-size: 22px; opacity: .55; }
+#hudScene { right: 120px; top: 60px; }
+#hudLabel { left: 120px; bottom: 60px; }
+#hudTime { right: 120px; bottom: 60px; }
+#hudTime i { display: inline-block; width: 14px; height: 14px; border-radius: 50%; background: var(--red); margin-right: 12px; vertical-align: 1px; }
+
+/* phone */
+.phone { position: absolute; left: 50%; top: 50%; width: 700px; height: 1300px; margin: -650px 0 0 -350px; border-radius: 86px; background: #111; box-shadow: 0 0 0 4px #2a2a2e, 0 60px 120px rgba(0,0,0,.6); }
+.screen { position: absolute; inset: 22px; border-radius: 66px; overflow: hidden; background: #1a1f2b; }
+.feed { position: absolute; left: 0; top: 0; width: 900px; height: 1350px; transform-origin: 0 0; }
+.feed img { position: absolute; }
+.feed .photo { left: 0; top: 0; width: 900px; height: 1350px; }
+.notch { position: absolute; left: 50%; top: 18px; width: 190px; height: 44px; margin-left: -95px; border-radius: 30px; background: #000; z-index: 5; }
+.chip { position: absolute; white-space: nowrap; left: 50%; bottom: 60px; transform: translateX(-50%); padding: 18px 30px; border-radius: 99px; background: rgba(0,0,0,.62); font-size: 30px; font-weight: 500; z-index: 4; }
+.chip b { font-weight: 600; color: #ffb3ae; margin-left: 12px; }
+.pill { position: absolute; height: 64px; padding: 0 28px; border-radius: 99px; display: flex; align-items: center; font-family: "JetBrains Mono", monospace; font-weight: 500; font-size: 24px; letter-spacing: .1em; text-transform: uppercase; background: rgba(255,255,255,.92); color: #111; z-index: 4; }
+.badge { position: absolute; left: 40px; top: 96px; padding: 12px 22px; border-radius: 99px; background: rgba(255,255,255,.16); font-size: 26px; z-index: 4; }
+.badge i { display: inline-block; width: 14px; height: 14px; border-radius: 50%; background: #3ddc84; margin-right: 12px; }
+.scan { position: absolute; left: 0; right: 0; height: 160px; background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,.55), rgba(255,255,255,0)); z-index: 3; }
+#vign { position: absolute; inset: 0; z-index: 30; pointer-events: none; background: radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(0,0,0,.42) 100%); }
+#grain { position: absolute; inset: 0; z-index: 31; pointer-events: none; opacity: .07; mix-blend-mode: overlay; }
+
+/* preview controls */
+#ui[hidden] { display: none; }
+#ui { position: fixed; left: 0; right: 0; bottom: 0; display: flex; gap: 12px; align-items: center; padding: 12px 16px; background: rgba(0,0,0,.8); font: 14px Inter, sans-serif; color: #fff; z-index: 99; }
+#ui button { padding: 8px 14px; border-radius: 8px; border: 0; background: #FF2A1F; color: #fff; font: inherit; cursor: pointer; }
+#ui input { flex: 1; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="bg" class="layer"></div>
+  <canvas id="gridc" class="layer" width="1080" height="1920"></canvas>
+
+  <!-- S1 spark -->
+  <div id="s1" class="layer">
+    <div id="spark" class="abs" style="left:540px;top:960px;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:var(--red)"></div>
+    <div id="line" class="abs" style="left:0;top:960px;width:1080px;height:4px;margin-top:-2px;background:var(--red);transform-origin:50% 50%"></div>
+    <div id="lineLabel" class="abs mono" style="left:96px;top:900px;font-size:24px;color:#cfcdc8">kiyim / virtual kiyinish xonasi — 2026</div>
+  </div>
+
+  <!-- S2 brand slam -->
+  <div id="s2" class="layer">
+    <div id="kick2" class="abs mono" style="left:540px;top:660px;transform:translateX(-50%);font-size:30px;color:var(--ink)">Do'koningiz uchun — 2026</div>
+    <div id="brand" class="abs slam" style="left:540px;top:760px;transform:translateX(-50%);font-size:270px;color:var(--ink);display:flex"></div>
+    <div id="dot" class="abs" style="width:70px;height:70px;border-radius:50%;background:var(--cream)"></div>
+    <div id="sub2" class="abs serif" style="left:540px;top:1120px;transform:translateX(-50%);font-size:96px;color:var(--ink)">virtual kiyinish xonasi</div>
+  </div>
+
+  <!-- S3 kinetic triplet -->
+  <div id="s3a" class="layer">
+    <div id="w1" class="abs slam center" style="font-size:165px;color:var(--ink)">ILOVASIZ.</div>
+    <div id="w1s" class="abs mono" style="left:540px;top:1110px;transform:translateX(-50%);font-size:30px;color:var(--ink);opacity:.7">hech narsa o'rnatish shart emas</div>
+  </div>
+  <div id="s3b" class="layer">
+    <div id="pattern" class="layer" style="overflow:hidden"></div>
+    <div id="w2" class="abs slam center" style="font-size:260px;color:var(--red)">JONLI.</div>
+    <div id="w2s" class="abs mono" style="left:540px;top:1140px;transform:translateX(-50%);font-size:30px;color:#fff;opacity:.75">kamera — kiyinish xonasi</div>
+  </div>
+  <div id="s3c" class="layer">
+    <div id="vf" class="abs center" style="width:860px;height:560px">
+      <div class="br tl" style="left:0;top:0;opacity:.9"></div><div class="br tr" style="right:0;top:0;opacity:.9"></div>
+      <div class="br bl" style="left:0;bottom:0;opacity:.9"></div><div class="br brr" style="right:0;bottom:0;opacity:.9"></div>
+      <div class="abs mono" style="right:16px;top:-46px;font-size:20px;opacity:.8">1080 × 1920</div>
+    </div>
+    <div id="w3wrap" class="abs center" style="overflow:hidden"><div id="w3" class="hand" style="font-size:250px;line-height:1.1;white-space:nowrap">harakatda</div></div>
+    <div id="w3s" class="abs mono" style="left:540px;top:1290px;transform:translateX(-50%);font-size:30px;opacity:.85">yuring, buriling — kiyim ergashadi</div>
+  </div>
+
+  <!-- S4 + S5 phone -->
+  <div id="sPhone" class="layer">
+    <div id="ghost" class="abs slam" style="left:0;top:180px;font-size:300px;color:transparent;-webkit-text-stroke:3px rgba(255,255,255,.12)">KIYIB KO'R · KIYIB KO'R · KIYIB KO'R</div>
+    <div id="ghost2" class="abs slam" style="left:0;top:1420px;font-size:300px;color:transparent;-webkit-text-stroke:3px rgba(255,255,255,.12)">JONLI · JONLI · JONLI · JONLI</div>
+    <div id="cam" class="layer" style="perspective:2400px">
+      <div id="phone" class="phone">
+        <div class="screen" id="screen">
+          <div id="feedMain" class="feed"></div>
+          <div id="halfL" class="abs" style="left:0;top:0;width:328px;height:1256px;overflow:hidden"><div id="feedL" class="feed"></div></div>
+          <div id="halfR" class="abs" style="left:328px;top:0;width:328px;height:1256px;overflow:hidden"><div id="feedR" class="feed"></div></div>
+          <div id="splitLine" class="abs" style="left:327px;top:0;width:3px;height:1256px;background:#fff"></div>
+          <div id="nameL" class="abs" style="left:24px;top:170px;padding:10px 18px;border-radius:99px;background:rgba(0,0,0,.6);font-size:22px;z-index:4">Qora mat puffer</div>
+          <div id="nameR" class="abs" style="right:24px;top:170px;padding:10px 18px;border-radius:99px;background:var(--red);font-size:22px;z-index:4">Bej teddy palto</div>
+          <div id="scan" class="scan"></div>
+          <div class="notch"></div>
+          <div class="badge"><i></i>Jonli · tana topildi</div>
+          <div id="pillCmp" class="pill" style="right:30px;top:96px">⇆ Yonma-yon</div>
+          <div id="chip" class="chip"></div>
+          <div id="addBtn" class="pill" style="left:50%;bottom:150px;transform:translateX(-50%);background:var(--red);color:#fff;height:80px;font-size:28px;padding:0 40px">+ Savatga</div>
+          <div id="toast" class="abs" style="left:50%;top:200px;transform:translateX(-50%);padding:22px 34px;border-radius:24px;background:rgba(0,0,0,.78);font-size:28px;z-index:6">Savatga qo'shildi ✓</div>
+        </div>
+      </div>
+      <div id="finger" class="abs" style="width:96px;height:96px;border-radius:50%;background:rgba(255,255,255,.35);border:4px solid #fff;z-index:20"></div>
+    </div>
+  </div>
+
+  <!-- S6 features -->
+  <div id="s6" class="layer">
+    <div id="k6" class="abs mono" style="left:120px;top:430px;font-size:28px;color:var(--red)">Imkoniyatlar</div>
+    <div id="list" class="abs" style="left:120px;top:520px"></div>
+  </div>
+
+  <!-- S7 end -->
+  <div id="s7" class="layer">
+    <div id="endName" class="abs serif" style="left:540px;top:700px;transform:translateX(-50%);font-size:300px;font-style:normal;line-height:1">Kiyim<span style="color:var(--red)">.</span></div>
+    <div id="endTag" class="abs serif" style="left:540px;top:1060px;transform:translateX(-50%);font-size:76px;color:#e6e4df">kiyib ko'ring, keyin sotib oling</div>
+    <div id="endRule" class="abs" style="left:240px;top:1200px;width:600px;height:2px;background:rgba(255,255,255,.5);transform-origin:50% 50%"></div>
+    <div id="endUrl" class="abs mono" style="left:540px;top:1240px;transform:translateX(-50%);font-size:34px;color:#cfcdc8"></div>
+  </div>
+
+  <!-- flood / wipe layer -->
+  <div id="flood" class="abs" style="left:0;width:1080px;z-index:25"></div>
+
+  <div id="vign"></div>
+  <canvas id="grain" width="540" height="960"></canvas>
+  <div id="hud">
+    <div class="br tl"></div><div class="br tr"></div><div class="br bl"></div><div class="br brr"></div>
+    <div id="hudScene" class="hudtxt mono"></div>
+    <div id="hudLabel" class="hudtxt mono"></div>
+    <div id="hudTime" class="hudtxt mono"><i></i><span></span></div>
+  </div>
+</div>
+
+<div id="ui" hidden><button id="playBtn">▶ Play</button><input id="scrub" type="range" min="0" max="15" step="0.01" value="0"><span id="tlabel">0.00</span></div>
+
+<script>
+/* ============================================================
+   BEAT SHEET — 128 BPM, beat = 0.46875 s, bar = 1.875 s, 9:16, 15 s
+   t       scene / moment                                         sound
+   0.00    S1 spark: dark grid, red dot appears, pulses           soft tick, riser starts
+   0.70    dot stretches into a line + mono label                 whoosh
+   1.41    line floods the frame vertically → red                 riser peaks
+   1.875   S2 brand slam: KIYIM letters on 1/16s, kicker, serif   IMPACT, kick+clap start, blips per letter
+   3.28    the full stop detaches and grows → cream background    whoosh
+   3.75    S3a "ILOVASIZ." dark on cream                          impact-lite
+   4.69    S3b "JONLI." red on black, outline pattern             hard swap (snare fill)
+   5.625   S3c "harakatda" handwritten on blue, viewfinder         draw-on shimmer
+   6.5625  S4 phone rises (white bar → screen), garments swap      whoosh, impact
+           every beat on the live feed with a scan line             blip per swap
+   9.375   S5 finger taps "⇆ Yonma-yon" → split; taps "+ Savatga"  click, click, toast chime
+   11.25   S6 feature list slams in, 1/2 beat each                blips
+   12.85   red flood from bottom                                  riser + impact
+   13.125  S7 end card: Kiyim. + tagline + URL typing             impact, ring-out, typing blips
+   ============================================================ */
+const VIDEO = { w: 1080, h: 1920, duration: 15 };
+window.VIDEO = VIDEO;
+const BPM = 128, B = 60 / BPM, BAR = B * 4;
+
+// ---------- helpers ----------
+function spring(t, w = 14, z = 0.82) {
+  if (t <= 0) return 0;
+  if (z >= 1) return 1 - Math.exp(-w * t) * (1 + w * t);
+  const wd = w * Math.sqrt(1 - z * z);
+  return 1 - Math.exp(-z * w * t) * (Math.cos(wd * t) + (z * w / wd) * Math.sin(wd * t));
+}
+const track = (v0, keys) => t => { let v = v0, p = v0; for (const [tk, val, w, z] of keys) { v += (val - p) * spring(t - tk, w, z); p = val; } return v; };
+const kf = keys => t => { if (t <= keys[0][0]) return keys[0][1]; for (let i = 1; i < keys.length; i++) { const [a, va] = keys[i - 1], [b, vb, e = ease] = keys[i]; if (t <= b) return lerp(va, vb, e((t - a) / (b - a))); } return keys[keys.length - 1][1]; };
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const ease = x => (x = clamp(x), x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+const easeOut = x => 1 - Math.pow(1 - clamp(x), 3);
+const easeIn = x => Math.pow(clamp(x), 3);
+const lerp = (a, b, k) => a + (b - a) * k;
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const rng = s => () => (s = (s + 0x6D2B79F5) | 0, s = Math.imul(s ^ (s >>> 15), 1 | s), s ^= s + Math.imul(s ^ (s >>> 7), 61 | s), ((s ^ (s >>> 14)) >>> 0) / 4294967296);
+const $ = id => document.getElementById(id);
+const show = (el, on) => { el.style.display = on ? "" : "none"; };
+const inRange = (t, a, b) => t >= a && t < b;
+
+// ---------- timeline ----------
+const T = {
+  s2: BAR, dotGo: BAR + 3 * B, s3a: 2 * BAR, s3b: 2 * BAR + 2 * B, s3c: 2 * BAR + 4 * B,
+  s4: 3 * BAR + 2 * B, s5: 5 * BAR, s6: 6 * BAR, flood7: 7 * BAR - 0.6 * B, s7: 7 * BAR, end: 15,
+};
+const SCENES = [
+  [0, "01", "Spark"], [T.s2, "02", "Brand"], [T.s3a, "03", "Kinetic type"],
+  [T.s4, "04", "Jonli kamera"], [T.s5, "05", "Yonma-yon"], [T.s6, "06", "Imkoniyatlar"], [T.s7, "07", "End"],
+];
+
+// ---------- garments on the live feed ----------
+// Suratdagi modelning tana nuqtalari (px-8360771.jpg, 900×1350, MediaPipe bilan topilgan)
+const BODY = { sx: 445.2, sy: 517.4, sw: 165.3, hx: 438.7, hy: 758.6 };
+const G = {
+  puffer: { src: "%%IMG:public/img/cutout/px-36018377.webp%%", fit: { w: 1.857, y: 0.234, y2: 0.852, x: 0.475 }, name: "Qora mat puffer kurtka", price: "2 390 000 so'm" },
+  teddy:  { src: "%%IMG:public/img/cutout/px-28969183.webp%%", fit: { w: 1.741, y: 0.216, y2: 0.838, x: 0.497 }, name: "Bej teddy palto", price: "2 790 000 so'm" },
+  avia:   { src: "%%IMG:public/img/cutout/px-14707853.webp%%", fit: { w: 1.734, y: 0.193, y2: 0.916, x: 0.441 }, name: "Qo'y junli aviator kurtka", price: "3 690 000 so'm" },
+  red:    { src: "%%IMG:public/img/cutout/mmw7oziy2.webp%%",   fit: { w: 1.644, y: 0.396, y2: 0.901, x: 0.482 }, name: "Qizil puffer kurtka", price: "2 390 000 so'm" },
+};
+const PHOTO = "%%IMG:public/img/products/px-8360771.jpg%%";
+function buildFeed(el) {
+  const img = new Image(); img.src = PHOTO; img.className = "photo"; el.appendChild(img);
+  const out = {};
+  for (const [k, g] of Object.entries(G)) {
+    const f = g.fit, w = BODY.sw * f.w, h = (BODY.hy - BODY.sy) / (f.y2 - f.y);
+    const e = new Image(); e.src = g.src;
+    Object.assign(e.style, { left: `${BODY.sx - w * f.x}px`, top: `${BODY.sy - h * f.y}px`, width: `${w}px`, height: `${h}px`, filter: "drop-shadow(0 10px 14px rgba(0,0,0,.35))" });
+    el.appendChild(e); out[k] = e;
+  }
+  return out;
+}
+const feedMain = buildFeed($("feedMain")), feedL = buildFeed($("feedL")), feedR = buildFeed($("feedR"));
+// feed transform so that the body is centred in a box of (bw × bh)
+function placeFeed(el, bw, bh, zoom = 1) {
+  const s = (bh / 1350) * zoom;
+  const ox = bw / 2 - BODY.sx * s, oy = bh * 0.5 - ((BODY.sy + BODY.hy) / 2) * s;
+  el.style.transform = `translate(${ox}px, ${oy}px) scale(${s})`;
+}
+const SWAPS = [[T.s4, "puffer"], [T.s4 + 1 * B, "teddy"], [T.s4 + 2 * B, "avia"], [T.s4 + 3 * B, "red"], [T.s4 + 4 * B, "teddy"], [T.s4 + 5 * B, "puffer"]];
+
+// ---------- static builds ----------
+const BRAND = "KIYIM";
+$("brand").innerHTML = [...BRAND].map((c, i) => `<span style="display:inline-block;overflow:hidden"><span id="L${i}" style="display:inline-block">${c}</span></span>`).join("");
+$("pattern").innerHTML = Array.from({ length: 9 }, (_, i) => `<div class="abs slam" style="left:${i % 2 ? -260 : 0}px;top:${i * 230 - 60}px;font-size:250px;color:transparent;-webkit-text-stroke:3px rgba(255,42,31,.35)">JONLI JONLI JONLI</div>`).join("");
+const FEATS = ["Orqa kamera", "Yonma-yon solishtirish", "To'plam: kurtka + shim", "O'lcham tavsiyasi", "AI bilan kiyib ko'rish", "Do'koningiz nomida"];
+$("list").innerHTML = FEATS.map((f, i) => `<div id="f${i}" style="display:flex;align-items:center;gap:30px;height:150px;font-family:'Archivo Black';font-size:50px;text-transform:uppercase;white-space:nowrap"><span style="display:inline-grid;place-items:center;width:74px;height:74px;border-radius:50%;background:var(--red);font-family:Inter;font-size:40px">✓</span>${f}</div>`).join("");
+const URL_TXT = "KIYIM-SHOP.ONRENDER.COM";
+
+// grid (static, drawn once)
+(() => { const c = $("gridc").getContext("2d"); c.strokeStyle = "rgba(255,255,255,.06)"; c.lineWidth = 1;
+  for (let x = 0; x <= 1080; x += 90) { c.beginPath(); c.moveTo(x + .5, 0); c.lineTo(x + .5, 1920); c.stroke(); }
+  for (let y = 0; y <= 1920; y += 90) { c.beginPath(); c.moveTo(0, y + .5); c.lineTo(1080, y + .5); c.stroke(); } })();
+// grain tiles (seeded)
+const grainTiles = (() => { const r = rng(7), tiles = []; for (let k = 0; k < 4; k++) { const c = document.createElement("canvas"); c.width = c.height = 128; const x = c.getContext("2d"), d = x.createImageData(128, 128); for (let i = 0; i < d.data.length; i += 4) { const v = r() * 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; } x.putImageData(d, 0, 0); tiles.push(c); } return tiles; })();
+const gctx = $("grain").getContext("2d");
+
+// ---------- tracks ----------
+const camRotY = kf([[T.s4, -14], [T.s4 + 1.4, 6], [T.s5, -4], [T.s6, 0]]);
+const camRotX = kf([[T.s4, 8], [T.s5, 2], [T.s6, 0]]);
+const phoneRise = t => spring(t - T.s4, 11, 0.7);
+const phoneOut = t => easeIn(seg(t, T.s6 - 0.35, T.s6));
+
+// ============================================================
+//  seek(t): pure function of time
+// ============================================================
+function seek(t) {
+  t = clamp(t, 0, VIDEO.duration - 1e-6);
+  const st = $("stage");
+
+  // background colour by scene
+  let bg = "#0B0B0C";
+  if (inRange(t, T.s2, T.s3a)) bg = "#FF2A1F";
+  if (inRange(t, T.s3a, T.s3b)) bg = "#EDEBE4";
+  if (inRange(t, T.s3b, T.s3c)) bg = "#000";
+  if (inRange(t, T.s3c, T.s4)) bg = "#2F47FF";
+  if (t >= T.s4 && t < T.s6) bg = "#0B0B0C";
+  $("bg").style.background = bg;
+  $("gridc").style.opacity = t < T.s2 ? 1 : (t >= T.s4 && t < T.s6) ? 0.6 : (t >= T.s6 ? 0.5 : 0);
+
+  // ---------- S1 spark ----------
+  const on1 = t < T.s2; show($("s1"), on1);
+  if (on1) {
+    const appear = spring(t - 0.08, 16, 0.55), pulse = 1 + 0.25 * Math.sin(seg(t, 0.2, 0.7) * Math.PI * 2) * (1 - seg(t, 0.6, 0.7));
+    const stretch = easeOut(seg(t, 0.7, 1.05));
+    $("spark").style.transform = `scale(${appear * pulse * (1 - stretch)})`;
+    const wob = Math.sin(seg(t, 1.05, 1.4) * Math.PI * 3) * (1 - seg(t, 1.05, 1.4)) * 6;
+    $("line").style.transform = `scaleX(${stretch}) translateY(${wob}px)`;
+    $("line").style.opacity = stretch > 0 ? 1 : 0;
+    $("lineLabel").style.opacity = seg(t, 0.85, 1.05) * (1 - seg(t, 1.45, 1.6));
+    $("lineLabel").style.transform = `translateY(${(1 - easeOut(seg(t, 0.85, 1.05))) * 20}px)`;
+  }
+  // flood S1 → S2 (line expands vertically)
+  const f1 = easeIn(seg(t, 1.41, T.s2));
+  // flood S6 → S7 (from bottom)
+  const f7 = easeIn(seg(t, T.flood7, T.s7)), f7out = easeOut(seg(t, T.s7, T.s7 + 0.35));
+  const fl = $("flood");
+  if (t >= 1.41 && t < T.s2) { const h = lerp(4, 1920, f1); Object.assign(fl.style, { display: "", top: `${960 - h / 2}px`, height: `${h}px`, background: "#FF2A1F" }); }
+  else if (t >= T.flood7 && t < T.s7 + 0.35) { const top = t < T.s7 ? lerp(1920, 0, f7) : lerp(0, -1920, f7out); Object.assign(fl.style, { display: "", top: `${top}px`, height: "1920px", background: "#FF2A1F" }); }
+  else fl.style.display = "none";
+
+  // ---------- S2 brand slam ----------
+  const on2 = inRange(t, T.s2, T.s3a); show($("s2"), on2);
+  if (on2) {
+    const lt = t - T.s2;
+    for (let i = 0; i < BRAND.length; i++) {
+      const p = spring(lt - i * B / 4, 18, 0.62);
+      $("L" + i).style.transform = `translateY(${(1 - p) * 110}%)`;
+    }
+    $("kick2").style.opacity = seg(lt, 0.1, 0.3);
+    $("kick2").style.letterSpacing = `${lerp(0.5, 0.14, easeOut(seg(lt, 0.1, 0.6)))}em`;
+    const s = spring(lt - 4 * B / 4 - 0.15, 14, 0.7);
+    $("sub2").style.opacity = clamp(s); $("sub2").style.transform = `translateX(-50%) translateY(${(1 - s) * 40}px)`;
+    // the full stop: appears after M, then detaches and floods
+    const bEl = $("brand"), brandR = bEl.offsetLeft + bEl.offsetWidth / 2 + 4; // translateX(-50%)
+    const dotIn = spring(lt - 5 * B / 4, 16, 0.6);
+    const go = seg(t, T.dotGo, T.s3a);
+    const size = 70 * dotIn + easeIn(go) * 4300;
+    const dx = lerp(brandR + 45, 540, easeOut(go)), dy = lerp(bEl.offsetTop + bEl.offsetHeight * 0.8, 960, easeOut(go));
+    Object.assign($("dot").style, { width: `${size}px`, height: `${size}px`, left: `${dx - size / 2}px`, top: `${dy - size / 2}px` });
+  }
+
+  // ---------- S3 kinetic triplet ----------
+  const on3a = inRange(t, T.s3a, T.s3b); show($("s3a"), on3a);
+  if (on3a) {
+    const p = spring(t - T.s3a, 16, 0.62);
+    $("w1").style.transform = `translate(-50%, -50%) translateX(${(1 - p) * -220}px) scale(${lerp(1.25, 1, p)})`;
+    $("w1").style.filter = `blur(${(1 - clamp(p * 1.4)) * 18}px)`;
+    $("w1s").style.opacity = seg(t, T.s3a + 0.25, T.s3a + 0.45) * 0.7;
+  }
+  const on3b = inRange(t, T.s3b, T.s3c); show($("s3b"), on3b);
+  if (on3b) {
+    const p = spring(t - T.s3b, 16, 0.62);
+    $("w2").style.transform = `translate(-50%, -50%) scale(${lerp(0.6, 1, p)})`;
+    $("w2").style.filter = `blur(${(1 - clamp(p * 1.4)) * 18}px)`;
+    $("pattern").style.transform = `translateX(${-(t - T.s3b) * 160}px)`;
+    $("w2s").style.opacity = seg(t, T.s3b + 0.25, T.s3b + 0.45) * 0.75;
+  }
+  const on3c = inRange(t, T.s3c, T.s4); show($("s3c"), on3c);
+  if (on3c) {
+    const p = spring(t - T.s3c, 14, 0.7);
+    $("vf").style.transform = `translate(-50%, -50%) scale(${lerp(1.2, 1, p)})`;
+    $("vf").style.opacity = clamp(p);
+    const draw = easeOut(seg(t, T.s3c + 0.05, T.s3c + 0.75));
+    const w3 = $("w3"); const W = w3.offsetWidth;
+    $("w3wrap").style.width = `${W * draw + 30}px`; $("w3wrap").style.height = `${w3.offsetHeight}px`;
+    $("w3wrap").style.transform = `translate(-${(W + 30) / 2}px, -50%)`;
+    $("w3s").style.opacity = seg(t, T.s3c + 0.6, T.s3c + 0.8) * 0.85;
+  }
+
+  // ---------- S4 + S5 phone ----------
+  const onP = inRange(t, T.s4, T.s6); show($("sPhone"), onP);
+  if (onP) {
+    const rise = phoneRise(t), out = phoneOut(t);
+    const sc = lerp(0.55, 1, rise) * lerp(1, 0.02, out) * kf([[T.s4, 1], [T.s5, 1.04], [T.s6, 1.04]])(t);
+    $("phone").style.transform = `translateY(${(1 - rise) * 500}px) rotateY(${camRotY(t)}deg) rotateX(${camRotX(t)}deg) scale(${sc})`;
+    $("phone").style.borderRadius = `${lerp(86, 400, out)}px`;
+    $("ghost").style.transform = `translateX(${-(t - T.s4) * 140}px)`;
+    $("ghost2").style.transform = `translateX(${-1400 + (t - T.s4) * 140}px)`;
+
+    // screen box: 656 × 1256
+    const SW = 656, SH = 1256;
+    const split = easeOut(seg(t, T.s5 + 0.47, T.s5 + 0.75));
+    placeFeed($("feedMain"), SW, SH, 1.0);
+    placeFeed($("feedL"), SW / 2, SH, 1.0); placeFeed($("feedR"), SW / 2, SH, 1.0);
+    // which garment is on (with top-down scan reveal on each swap)
+    let cur = SWAPS[0][1], prev = null, swapT = SWAPS[0][0];
+    for (const [ts, g] of SWAPS) if (t >= ts) { prev = cur === g ? prev : cur; cur = g; swapT = ts; }
+    if (t >= T.s5) { cur = "teddy"; prev = null; }
+    const rev = seg(t, swapT, swapT + 0.22);
+    for (const [k, e] of Object.entries(feedMain)) {
+      if (k === cur) { e.style.opacity = 1; e.style.clipPath = t < T.s5 ? `inset(0 0 ${(1 - rev) * 100}% 0)` : "none"; }
+      else if (k === prev && rev < 1 && t < T.s5) { e.style.opacity = 1; e.style.clipPath = `inset(${rev * 100}% 0 0 0)`; }
+      else e.style.opacity = 0;
+    }
+    const scanOn = t < T.s5 && rev > 0 && rev < 1;
+    $("scan").style.display = scanOn ? "" : "none";
+    $("scan").style.top = `${lerp(-160, SH, rev)}px`;
+    const g = G[cur];
+    $("chip").innerHTML = `${g.name}<b>${g.price}</b>`;
+    $("chip").style.opacity = 1 - split;
+
+    // split view (S5): left puffer, right teddy
+    for (const [k, e] of Object.entries(feedL)) e.style.opacity = k === "puffer" ? 1 : 0;
+    for (const [k, e] of Object.entries(feedR)) e.style.opacity = k === "teddy" ? 1 : 0;
+    show($("halfL"), split > 0); show($("halfR"), split > 0); show($("splitLine"), split > 0);
+    $("halfL").style.clipPath = `inset(0 ${(1 - split) * 100}% 0 0)`;
+    $("splitLine").style.transform = `scaleY(${split})`;
+    $("nameL").style.opacity = split; $("nameR").style.opacity = split;
+    $("feedMain").style.opacity = 1;
+
+    // finger taps: ⇆ Yonma-yon at s5+0.47, + Savatga at s5+1.4
+    const tap1 = T.s5 + 0.47, tap2 = T.s5 + 1.41;
+    const fx = kf([[T.s5, 900], [tap1 - 0.05, 815], [tap1 + 0.3, 815], [tap2 - 0.05, 540], [T.s6, 540]])(t);
+    const fy = kf([[T.s5, 1150], [tap1 - 0.05, 470], [tap1 + 0.3, 470], [tap2 - 0.05, 1330], [T.s6, 1330]])(t);
+    const press = Math.max(1 - Math.abs(t - tap1) / 0.12, 1 - Math.abs(t - tap2) / 0.12, 0);
+    Object.assign($("finger").style, { display: t >= T.s5 && t < T.s6 - 0.35 ? "" : "none", left: `${fx - 48}px`, top: `${fy - 48}px`, transform: `scale(${1 - press * 0.25})` });
+    const cmpOn = t >= tap1;
+    $("pillCmp").style.background = cmpOn ? "#FF2A1F" : "rgba(255,255,255,.92)";
+    $("pillCmp").style.color = cmpOn ? "#fff" : "#111";
+    $("pillCmp").style.transform = `scale(${1 + 0.12 * Math.max(0, 1 - Math.abs(t - tap1) / 0.15)})`;
+    const added = t >= tap2;
+    $("addBtn").style.display = t >= T.s5 ? "" : "none";
+    $("addBtn").textContent = added ? "Qo'shildi ✓" : "+ Savatga";
+    $("addBtn").style.background = added ? "#1f9d55" : "#FF2A1F";
+    const toast = spring(t - tap2 - 0.05, 16, 0.7);
+    $("toast").style.display = added ? "" : "none";
+    $("toast").style.transform = `translateX(-50%) translateY(${(1 - toast) * -60}px)`;
+    $("toast").style.opacity = clamp(toast);
+  }
+
+  // ---------- S6 features ----------
+  const on6 = inRange(t, T.s6, T.s7); show($("s6"), on6);
+  if (on6) {
+    $("k6").style.opacity = seg(t, T.s6, T.s6 + 0.15);
+    FEATS.forEach((_, i) => {
+      const p = spring(t - T.s6 - 0.1 - i * B / 2, 18, 0.62);
+      const el = $("f" + i);
+      el.style.transform = `translateX(${(1 - p) * -900}px)`;
+      el.style.opacity = clamp(p * 2);
+      el.style.color = i === Math.min(FEATS.length - 1, Math.floor((t - T.s6 - 0.1) / (B / 2))) ? "#fff" : "rgba(255,255,255,.55)";
+    });
+  }
+
+  // ---------- S7 end ----------
+  const on7 = t >= T.s7; show($("s7"), on7);
+  if (on7) {
+    const p = spring(t - T.s7 - 0.15, 12, 0.7);
+    $("endName").style.transform = `translateX(-50%) scale(${lerp(1.3, 1, p)})`; $("endName").style.opacity = clamp(p * 1.5);
+    const q = spring(t - T.s7 - 0.45, 14, 0.8);
+    $("endTag").style.opacity = clamp(q); $("endTag").style.transform = `translateX(-50%) translateY(${(1 - q) * 30}px)`;
+    $("endRule").style.transform = `scaleX(${easeOut(seg(t, T.s7 + 0.6, T.s7 + 1.0))})`;
+    const n = Math.floor(seg(t, T.s7 + 0.75, T.s7 + 1.55) * URL_TXT.length);
+    const caret = Math.floor((t - T.s7) * 4) % 2 === 0 ? "▍" : " ";
+    $("endUrl").textContent = URL_TXT.slice(0, n) + (n < URL_TXT.length || caret === "▍" ? caret : " ");
+  }
+
+  // ---------- HUD ----------
+  let sc = SCENES[0]; for (const s of SCENES) if (t >= s[0]) sc = s;
+  $("hudScene").textContent = `Scene ${sc[1]} / 07`;
+  $("hudLabel").textContent = sc[2];
+  const fr = Math.floor((t % 1) * 30);
+  $("hudTime").querySelector("span").textContent = `00:${String(Math.floor(t)).padStart(2, "0")}:${String(fr).padStart(2, "0")}`;
+  const light = inRange(t, T.s2, T.s3b) && !(t >= T.dotGo && t < T.s3a && false);
+  $("hud").style.color = light ? "#0B0B0C" : "#fff";
+
+  // ---------- grain ----------
+  const tile = grainTiles[Math.floor(t * 24) % 4];
+  gctx.fillStyle = gctx.createPattern(tile, "repeat"); gctx.fillRect(0, 0, 540, 960);
+}
+window.seek = seek;
+
+// ============================================================
+//  SOUND — synthesised, same timeline
+// ============================================================
+window.buildAudio = async function (ctx) {
+  const sr = ctx.sampleRate, out = ctx.createGain(); out.gain.value = 0.8; out.connect(ctx.destination);
+  const music = ctx.createGain(); music.gain.value = 0.55; music.connect(out);
+  const fx = ctx.createGain(); fx.gain.value = 0.8; fx.connect(out);
+  const r = rng(11), nb = ctx.createBuffer(1, sr * 2, sr), nd = nb.getChannelData(0); for (let i = 0; i < nd.length; i++) nd[i] = r() * 2 - 1;
+  const noise = (t, dur, type, f0, f1, gain, dest = fx, q = 1) => {
+    const s = ctx.createBufferSource(); s.buffer = nb; const f = ctx.createBiquadFilter(); f.type = type; f.Q.value = q;
+    f.frequency.setValueAtTime(f0, t); f.frequency.exponentialRampToValueAtTime(f1, t + dur);
+    const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(gain, t + Math.min(0.02, dur / 3)); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    s.connect(f); f.connect(g); g.connect(dest); s.start(t, r() * 1.5); s.stop(t + dur + 0.05);
+  };
+  const tone = (t, dur, type, f0, f1, gain, dest = fx, attack = 0.005) => {
+    const o = ctx.createOscillator(); o.type = type; o.frequency.setValueAtTime(f0, t); if (f1) o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+    const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(gain, t + attack); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(dest); o.start(t); o.stop(t + dur + 0.05);
+  };
+  const kick = t => { tone(t, 0.32, "sine", 150, 42, 1.0, music); noise(t, 0.03, "highpass", 3000, 2000, 0.25, music); };
+  const clap = t => { for (const d of [0, 0.012, 0.024]) noise(t + d, 0.14, "bandpass", 1800, 1200, 0.5, music, 1.2); };
+  const hat = t => noise(t, 0.05, "highpass", 8000, 7000, 0.18, music);
+  const impact = t => { tone(t, 0.9, "sine", 90, 30, 1.0, fx); noise(t, 0.6, "lowpass", 3000, 200, 0.6, fx); };
+  const whoosh = (t, d = 0.35) => noise(t - d * 0.7, d, "bandpass", 400, 4000, 0.35, fx, 0.8);
+  const riser = (t0, t1) => { noise(t0, t1 - t0, "bandpass", 300, 6000, 0.3, fx, 2); tone(t0, t1 - t0, "sawtooth", 110, 440, 0.06, fx, (t1 - t0) * 0.9); };
+  const blip = (t, f = 1200, g = 0.12) => tone(t, 0.07, "square", f, f * 0.9, g, fx);
+
+  // drums: from the brand slam to the end card
+  for (let b = 4; b < 28; b++) { const t = b * B; kick(t); if (b % 2 === 1) clap(t); hat(t + B / 2); }
+  // sub bass per bar (A, F, C, G)
+  const roots = [55, 43.65, 65.41, 49];
+  for (let bar = 1; bar < 7; bar++) for (let k = 0; k < 8; k++) { const t = bar * BAR + k * B / 2; tone(t, B / 2 * 0.9, "sawtooth", roots[bar % 4], null, 0.12, music, 0.01); }
+  // pad chord on the end card
+  for (const f of [220, 261.6, 329.6]) tone(T.s7, 1.9, "triangle", f, null, 0.05, music, 0.3);
+
+  riser(0.1, BAR); tone(0.1, 0.08, "sine", 2000, 1800, 0.08);
+  whoosh(0.85, 0.3); impact(T.s2);
+  for (let i = 0; i < 5; i++) blip(T.s2 + i * B / 4, 900 + i * 120);
+  whoosh(T.s3a); impact(T.s3a);
+  noise(T.s3b, 0.12, "bandpass", 2500, 1500, 0.5, fx, 1); whoosh(T.s3b, 0.2);
+  whoosh(T.s3c, 0.25); for (let i = 0; i < 6; i++) tone(T.s3c + 0.05 + i * 0.11, 0.12, "sine", 1600 + i * 180, null, 0.05);
+  whoosh(T.s4); impact(T.s4);
+  for (const [ts] of SWAPS.slice(1)) { blip(ts, 1500, 0.09); noise(ts, 0.22, "highpass", 6000, 3000, 0.12); }
+  whoosh(T.s5, 0.25);
+  for (const ts of [T.s5 + 0.47, T.s5 + 1.41]) { blip(ts, 2200, 0.1); noise(ts, 0.03, "highpass", 4000, 3000, 0.3); }
+  tone(T.s5 + 1.46, 0.35, "sine", 1318, null, 0.12); tone(T.s5 + 1.58, 0.45, "sine", 1760, null, 0.1);
+  whoosh(T.s6 - 0.1, 0.3); for (let i = 0; i < 6; i++) blip(T.s6 + 0.1 + i * B / 2, 700 + i * 90, 0.08);
+  riser(T.flood7 - 0.6, T.s7); impact(T.s7);
+  for (let i = 0; i < URL_TXT.length; i++) blip(T.s7 + 0.75 + i * (0.8 / URL_TXT.length), 2400, 0.04);
+  tone(T.s7 + 0.2, 1.6, "sine", 880, null, 0.08, fx, 0.01);
+};
+
+// ============================================================
+//  preview / render mode
+// ============================================================
+const RENDER = location.search.includes("render");
+function fit() { const s = Math.min(innerWidth / 1080, (innerHeight - 56) / 1920); $("stage").style.transform = `scale(${s})`; $("stage").style.left = `${(innerWidth - 1080 * s) / 2}px`; }
+if (!RENDER) {
+  $("ui").hidden = false; fit(); addEventListener("resize", fit);
+  let buf, ac, src, startAt = 0, offset = 0, playing = false;
+  async function play() {
+    ac ??= new AudioContext();
+    if (!buf) { const off = new OfflineAudioContext(2, Math.ceil(48000 * VIDEO.duration), 48000); await buildAudio(off); buf = await off.startRendering(); }
+    src = ac.createBufferSource(); src.buffer = buf; src.connect(ac.destination);
+    src.start(0, offset % VIDEO.duration); startAt = ac.currentTime; playing = true; $("playBtn").textContent = "❚❚ Pause";
+  }
+  function pause() { if (!playing) return; offset += ac.currentTime - startAt; src.stop(); playing = false; $("playBtn").textContent = "▶ Play"; }
+  const now = () => playing ? (offset + ac.currentTime - startAt) % VIDEO.duration : offset;
+  $("playBtn").onclick = () => (playing ? pause() : play());
+  $("scrub").oninput = (e) => { const was = playing; pause(); offset = +e.target.value; if (was) play(); };
+  (function loop() { const t = now(); seek(t); $("scrub").value = t; $("tlabel").textContent = t.toFixed(2); requestAnimationFrame(loop); })();
+} else seek(0);
+</script>
+</body>
+</html>
