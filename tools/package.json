@@ -1,0 +1,13 @@
+{
+  "name": "kiyim-tools",
+  "private": true,
+  "description": "Faqat sizning kompyuteringiz uchun: yangi mahsulot qo'shish vositasi. Render'ga o'rnatilmaydi.",
+  "type": "module",
+  "scripts": {
+    "mahsulot": "node mahsulot.mjs"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^4.3.2",
+    "@imgly/background-removal-node": "^1.4.5"
+  }
+}

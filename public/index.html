@@ -16,10 +16,10 @@
   <!-- 1. Yuguruvchi e'lon qatori -->
   <div class="ticker">
     <div class="ticker__track">
-      <span>● Toshkent bo'ylab yetkazib berish 1 kunda</span>
+      <span data-brand="delivery">● Toshkent bo'ylab yetkazib berish 1 kunda</span>
       <span>● Hech narsa o'rnatish shart emas — kamerangiz yetarli</span>
       <span>● Kiyib ko'ring, keyin buyurtma bering</span>
-      <span>● Toshkent bo'ylab yetkazib berish 1 kunda</span>
+      <span data-brand="delivery">● Toshkent bo'ylab yetkazib berish 1 kunda</span>
       <span>● Hech narsa o'rnatish shart emas — kamerangiz yetarli</span>
       <span>● Kiyib ko'ring, keyin buyurtma bering</span>
     </div>
@@ -27,7 +27,7 @@
 
   <!-- 2. Header -->
   <header class="header">
-    <a href="#" class="logo">Kiyim<span>.</span></a>
+    <a href="#" class="logo"><b data-brand="name">Kiyim</b><span>.</span></a>
     <nav class="nav" id="nav"></nav>
     <button class="cart-btn" id="cartBtn">
       Savat <span class="cart-btn__count" id="cartCount">0</span>
@@ -64,8 +64,9 @@
   </section>
 
   <footer class="footer">
-    <span>© 2026 Kiyim</span>
-    <span class="mono">Kamera faqat brauzeringizda ishlaydi · Suratlar: Unsplash</span>
+    <span>© 2026 <span data-brand="name">Kiyim</span></span>
+    <span class="footer__contacts" data-brand="contacts" hidden></span>
+    <span class="mono" data-brand="credit">Kamera faqat brauzeringizda ishlaydi · Suratlar: Unsplash, Pexels</span>
   </footer>
 
   <!-- 5. Savat va buyurtma -->
@@ -88,8 +89,8 @@
     <form class="drawer__view checkout" id="viewCheckout" hidden>
       <label>Ismingiz<input name="name" required minlength="2" autocomplete="name" placeholder="Aziz"></label>
       <label>Telefon<input name="phone" required type="tel" autocomplete="tel" placeholder="+998 90 123 45 67"></label>
-      <label>Manzil<textarea name="address" rows="3" placeholder="Toshkent, Chilonzor 9-kvartal, 12-uy"></textarea></label>
-      <p class="checkout__note mono">To'lov: yetkazib berilganda naqd yoki karta orqali</p>
+      <label>Manzil<textarea name="address" rows="3" data-brand="city" placeholder="Toshkent, Chilonzor 9-kvartal, 12-uy"></textarea></label>
+      <p class="checkout__note mono" data-brand="payment">To'lov: yetkazib berilganda naqd yoki karta orqali</p>
       <p class="form-error" id="orderError"></p>
       <div class="drawer__foot">
         <div class="drawer__total"><span>Jami</span><b id="checkoutTotal">0 so'm</b></div>
@@ -246,6 +247,7 @@
     </aside>
   </div>
 
+  <script src="js/brand.js"></script>
   <script src="js/products.js"></script>
   <script src="js/shop.js"></script>
   <script type="module" src="js/tryon.js"></script>

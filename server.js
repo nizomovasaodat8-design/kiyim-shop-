@@ -34,6 +34,7 @@ const PUBLIC = path.join(__dirname, "public");
 // Mahsulotlar ro'yxati brauzer bilan bitta faylda — narxni server shu yerdan oladi,
 // shuning uchun hech kim brauzerda narxni o'zgartirib arzon sotib ololmaydi.
 const { PRODUCTS } = require("./public/js/products.js");
+const { BRAND } = require("./public/js/brand.js");
 const DATA = path.join(__dirname, "data");
 const ORDERS = path.join(DATA, "orders.json");
 fs.mkdirSync(DATA, { recursive: true });
@@ -425,7 +426,7 @@ async function notifyTelegram(o) {
   if (!TG_TOKEN || !TG_CHAT) return;
   const fmt = (n) => n.toLocaleString("ru-RU").replace(/,/g, " ") + " so'm";
   const text = [
-    `🛍 Yangi buyurtma #${o.id}`,
+    `🛍 ${BRAND.name}: yangi buyurtma #${o.id}`,
     `👤 ${o.name}`, `📞 ${o.phone}`, o.address && `📍 ${o.address}`, "",
     ...o.items.map((i) => `• ${i.name} × ${i.qty} — ${fmt(i.price * i.qty)}`),
     "", `💰 Jami: ${fmt(o.total)}`,

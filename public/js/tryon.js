@@ -145,11 +145,67 @@ async function loadPose() {
       runningMode: "VIDEO",
       numPoses: 1,
     });
+    vision = { PoseLandmarker, files };
     setStatus("");
+    if (current) autoFit(current);
   } catch (err) {
     console.warn("Pose modeli yuklanmadi", err);
     setStatus("Tana modeli yuklanmadi (internetni tekshiring). AI rejim baribir ishlaydi.");
   }
+}
+
+// ---------- YANGI MAHSULOTLAR UCHUN AVTOMATIK MOSLASH ----------
+// tools/mahsulot.mjs qo'shgan buyumlarda "box" bor (kiyim suratning qayerida), lekin "fit" yo'q.
+// Suratdagi modelning yelka/son nuqtalarini bir marta topib, fit'ni shu yerda hisoblaymiz.
+let vision = null, imagePose = null;
+async function autoFit(p) {
+  if (!p.box || p.fit || p.fitTried || !vision) return;
+  p.fitTried = true;
+  const key = `kiyim-fit-${p.id}-${p.img}`;
+  try { const c = JSON.parse(localStorage.getItem(key)); if (c) return void (p.fit = c); } catch {}
+  try {
+    imagePose ??= await vision.PoseLandmarker.createFromOptions(vision.files, {
+      baseOptions: { modelAssetPath: MODEL_URL.replaceAll("pose_landmarker_lite", "pose_landmarker_full"), delegate: "CPU" },
+      runningMode: "IMAGE",
+      numPoses: 1,
+    });
+    const img = new Image();
+    img.src = p.img;
+    await img.decode();
+    const lm = imagePose.detect(img).landmarks?.[0];
+    const fit = lm && fitFromPose(p, lm, img.naturalWidth, img.naturalHeight);
+    if (fit) {
+      p.fit = fit;
+      try { localStorage.setItem(key, JSON.stringify(fit)); } catch {}
+    }
+  } catch (err) {
+    console.warn("Avtomatik moslash bo'lmadi:", p.name, err);
+  }
+}
+
+function fitFromPose(p, lm, iw, ih) {
+  const [bl, bt, br, bb] = p.box;
+  const l = bl * iw, t = bt * ih, W = (br - bl) * iw, H = (bb - bt) * ih;
+  const P = (i) => ({ x: lm[i].x * iw, y: lm[i].y * ih });
+  const r = (v) => +v.toFixed(3);
+  const fx = (pt) => r((pt.x - l) / W), fy = (pt) => r((pt.y - t) / H);
+  if (p.type === "top" || p.type === "dress") {
+    const s1 = P(11), s2 = P(12), sm = mid(s1, s2), sw = dist(s1, s2), hm = mid(P(23), P(24));
+    if (sw / W < 0.33 || hm.y - sm.y < 0.6 * sw) return null;   // yonboshlab turgan model — mos emas
+    return { w: r(W / sw), y: fy(sm), y2: fy(hm), x: fx(sm), x2: fx(hm), a: r(level(s1, s2)) };
+  }
+  if (p.type === "pants") {
+    const h1 = P(23), h2 = P(24), hw = dist(h1, h2), hm = mid(h1, h2), am = mid(P(27), P(28));
+    const waist = { x: hm.x, y: hm.y - hw * 0.15 };
+    if (hw / W < 0.25 || am.y - waist.y < 2 * hw) return null;
+    return { w: r(W / hw), y: fy(waist), y2: fy(am), x: fx(waist), x2: fx(am) };
+  }
+  if (p.type === "hat") {
+    const e1 = P(7), e2 = P(8), head = dist(e1, e2), eyes = mid(P(2), P(5));
+    const an = { x: eyes.x, y: eyes.y - head * 0.3 };
+    return { w: r(W / head), y: fy(an), x: fx(an), a: r(level(e1, e2)) };
+  }
+  return null;
 }
 
 // ---------- ASOSIY SIKL ----------
@@ -638,7 +694,7 @@ function select(id) {
   const next = window.byId(id);
   if (current && current.id !== next.id && current.live) prevItem = current; // yonma-yon uchun
   current = next;
-  if (current.live) wear(current);
+  if (current.live) { wear(current); autoFit(current); }
   $("#nowName").innerHTML = `${current.name} <b>${formatPrice(current.price)}</b>`;
   const cat = CATEGORIES.find((c) => c.id === current.cat);
   $("#curImg").innerHTML = `<img src="${current.img}" alt="">`;

@@ -93,6 +93,7 @@ const PRODUCTS = [
   P(26, "1590874103328-eac38a683ce7", { cat: "aksessuar", type: "bag", live: true, name: "To'qima savat-sumka", price: 690000 }),
   P(27, "1584917865442-de89df76afd3", { cat: "aksessuar", type: "bag", live: true, name: "Qizil charm sumka",   price: 1290000 }),
   P(28, "1553062407-98eeb64c6a62",    { cat: "aksessuar", type: "bag", live: true, name: "Shahar ryukzagi",     price: 560000 }),
+  P(43, "mmw7oziy2", { cat: "qish", type: "top", live: true, name: "Qizil puffer kurtka", price: 2390000, isNew: true, box: [0.284, 0.006, 0.969, 0.727] }),
 ];
 
 // 1676000 → "1 676 000 so'm"

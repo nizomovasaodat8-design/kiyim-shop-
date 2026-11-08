@@ -54,11 +54,40 @@ kiyim-shop/
     └── img/cutout/      ← foni olib tashlangan suratlar (jonli rejim uchun)
 ```
 
-## 4. Yangi mahsulot qo'shish
+## 4. Yangi mijoz (do'kon) uchun moslash
 
-1. Suratni `public/img/products/` ga qo'ying (masalan `kurtka.jpg`).
-2. Fonini olib tashlang (masalan remove.bg yoki Photoshop) va `public/img/cutout/kurtka.webp` qilib saqlang.
-3. `public/js/products.js` dagi ro'yxatga bitta qator qo'shing.
+### 4.1. Do'kon nomi, rangi, aloqa — `public/js/brand.js`
+Faqat shu faylni o'zgartirasiz: `name` (nom), `city`, `delivery` (yetkazib berish matni),
+`payment`, `phone`, `telegram`, `instagram`, `accent` (asosiy rang, masalan `"#2a6bff"`),
+`photoCredit`. Sayt, admin sahifa va Telegram xabari shu yerdan oladi.
+
+### 4.2. Yangi mahsulot qo'shish — bitta buyruq
+Bir marta o'rnatish (kompyuteringizda, ~300 MB):
+
+```
+cd tools
+npm install
+```
+
+Keyin har bir kiyim uchun (loyiha papkasida):
+
+```
+node tools/mahsulot.mjs kurtka.jpg --nom "Qora palto" --narx 1990000 --tur top --bolim qish --yangi
+```
+
+- `--tur`: `top` (kurtka, palto, sviter), `dress` (ayollar ko'ylagi), `pants`, `shoes`, `hat`, `glasses`, `bag`
+- `--bolim`: `products.js` dagi bo'limlardan biri (`qish`, `ustki`, `koylak`, `jinsi`, …)
+- surat o'rniga `https://...` havola ham berish mumkin
+- `--odamsiz` — surat odamsiz bo'lsa (kiyim stolda yoki ilgichda)
+
+Vosita o'zi: fonni olib tashlaydi, model kiygan bo'lsa faqat kiyimni ajratadi (yuz, qo'l, sochsiz),
+qo'l o'rnidagi teshiklarni to'ldiradi va `products.js` ga qator qo'shadi. Kiyimni tanaga moslash
+saytning o'zida (brauzerda) birinchi ochilganda avtomatik hisoblanadi.
+
+**Qanday surat yaxshi ishlaydi:** model old tomondan, to'liq yoki tizzagacha ko'rinadi, kiyimni
+qo'l yoki soch to'smaydi, fon kiyimdan farqli rangda. Yonboshlab turgan, ko'krakdan kesilgan yoki
+sochi kiyim ustiga tushgan suratlar yomon chiqadi — natijani saytda ko'rib, yoqmasa o'chiring:
+`products.js` dagi qatorni va ikki rasmni (`img/products/...jpg`, `img/cutout/...webp`) o'chirasiz.
 
 ## 5. Internetga chiqarish (keyingi qadam)
 
